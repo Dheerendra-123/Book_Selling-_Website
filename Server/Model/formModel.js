@@ -1,77 +1,83 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const bookSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
   },
   author: {
     type: String,
-    required: true
+    required: true,
   },
   edition: {
     type: String,
-    default:'1st'
+    default: "1st",
   },
-   isbn: {
+  isbn: {
     type: String,
     trim: true,
     validate: {
       validator: function (v) {
-        return /^(\d{10}|\d{13})$/.test(v) || v === '';
+        return /^(\d{10}|\d{13})$/.test(v) || v === "";
       },
-      message: props => `${props.value} is not a valid ISBN number!`
+      message: (props) => `${props.value} is not a valid ISBN number!`,
     },
-    default: ''
+    default: "",
   },
   category: {
     type: String,
-    required: true
+    required: true,
   },
   condition: {
     type: String,
-    required: true
+    required: true,
   },
   price: {
     type: Number,
-    required: true
+    required: true,
   },
   originalPrice: {
     type: Number,
   },
   description: {
     type: String,
-    maxlength: 500
+    maxlength: 500,
   },
-  image: {
-    type: String,
-    required: true
+  images: {
+    type: [String], 
+    required: true,
+    validate: {
+      validator: function (arr) {
+        return arr.length > 0;
+      },
+      message: "At least one image is required",
+    },
   },
   isSold: {
     type: Boolean,
-    default: false
+    default: false,
   },
-  sellerName:{
-    type:String,
-    required:true,
+  sellerName: {
+    type: String,
+    required: true,
   },
-  email:{
-    type:String,
-    required:true
+  email: {
+    type: String,
+    required: true,
   },
-  state:{
-    type:String,
-    required:true
+  state: {
+    type: String,
+    required: true,
   },
-  city:{
-    type:String,
-    required:true
+  city: {
+    type: String,
+    required: true,
   },
-  pinCode:{
-    type:Number,
-    required:true
+  pinCode: {
+    type: Number,
+    required: true,
   },
-})
+});
 
-export const formModel = mongoose.model('BookForm', bookSchema);
+export const formModel = mongoose.model("BookForm", bookSchema);

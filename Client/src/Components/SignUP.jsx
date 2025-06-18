@@ -163,7 +163,7 @@ const SignUP = () => {
 
                     </FormControl>
                     <Button type='submit' variant='contained' size='large'>
-                        {isloading?<CircularProgress/>:'SignUP'}
+                        {isloading?<CircularProgress size='medium'/>:'SignUP'}
                     </Button>
                             <Box sx={{textAlign:'center'}}>
                         <Typography variant='h7' color='grey'>

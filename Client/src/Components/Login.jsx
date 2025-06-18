@@ -151,7 +151,7 @@ const Login = () => {
 
                         </FormControl>
                         <Button type='submit' variant='contained' size='large'>
-                            {isLoading ? <CircularProgress size='small'/> : 'Login'}
+                            {isLoading ? <CircularProgress size='medium'/> : 'Login'}
                         </Button>
                         <Box sx={{textAlign:'center'}}>
                         <Typography variant='h7' color='grey'>

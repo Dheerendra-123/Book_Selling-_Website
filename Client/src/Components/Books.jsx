@@ -11,6 +11,7 @@ import img from '../assets/img.png'
 import Button from '@mui/material/Button'
 import CardActions from '@mui/material/CardActions'
 import { useNavigate } from 'react-router-dom'
+import DiscountIcon from '@mui/icons-material/Discount';
 
 const Books = () => {
 
@@ -74,19 +75,22 @@ const Books = () => {
     }
   ];
 
-  const navigate=useNavigate();
+  const navigate = useNavigate();
 
   const handleClick = (type) => {
     console.log(`clicked on chip ${type}`);
   }
 
-  const previewHandle=()=>{
+  const previewHandle = () => {
     navigate('/book-preview');
   }
 
-  const detailsHandle=()=>{
+  const detailsHandle = () => {
     navigate('/view-details');
   }
+    const originalPrice = 200;
+  const newPrice = 100;
+  const discount = ((originalPrice - newPrice) / originalPrice) * 100;
   return (
     <>
       <Box
@@ -97,7 +101,7 @@ const Books = () => {
         }}
       >
       </Box>
-      <Container maxWidth={false} sx={{ maxWidth: '96%',mb:'20px' }}>
+      <Container maxWidth={false} sx={{ maxWidth: '96%', mb: '20px' }}>
         <Box >
           <Stack direction='row' gap={1} mt={3}>
             {
@@ -128,9 +132,42 @@ const Books = () => {
                     <Typography variant="body2" color="text.secondary">
                       Edition: {book.edition}
                     </Typography>
-                    <Typography variant="body2" color="text.primary">
-                      Price: {book.price}
+                    <Stack direction='row' gap={1} mt={1}>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        textDecoration: 'line-through',
+                        color: 'gray',
+                        fontWeight: 500,
+                      }}
+                    >
+                      ₹{originalPrice}
                     </Typography>
+
+                    {/* New Price */}
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: 'black',
+                        fontWeight: 'bold',
+                        fontSize: '1.2rem',
+                      }}
+                    >
+                      ₹{newPrice}
+                    </Typography>
+
+                    {/* Discount Chip */}
+                    <Chip
+                      icon={<DiscountIcon/>}
+                      size='small'
+                      label={`${Math.round(discount)}% OFF`}
+                      color="success"
+                      variant='outlined'
+                      sx={{
+                        fontWeight: 'bold',
+                      }}
+                    />
+                    </Stack>
                   </CardContent>
                   <CardActions>
                     <Button size="small" variant='outlined' onClick={previewHandle}>Preview</Button>
