@@ -14,6 +14,7 @@ import Books from './Components/Books';
 import BookDetails from './Components/BookDetails';
 import PreviewBook from './Components/PreviewBook';
 import Cart from './Components/Cart';
+import SellBookForm from './Components/SellBookForm';
 
 const App = () => {
   
@@ -35,7 +36,7 @@ const router = createBrowserRouter([
         ),
       },
        {
-        path: 'view-details',
+        path: 'view-details/:id',
         element: (
           <ProtectedRoute>
             <BookDetails />
@@ -43,7 +44,7 @@ const router = createBrowserRouter([
         ),
       },
        {
-        path: 'book-preview',
+        path: 'book/:id',
         element: (
           <ProtectedRoute>
             <PreviewBook />
@@ -63,6 +64,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Books />
+          </ProtectedRoute>
+        ),
+      },
+       {
+        path: 'sell-form',
+        element: (
+          <ProtectedRoute>
+            <SellBookForm />
           </ProtectedRoute>
         ),
       },

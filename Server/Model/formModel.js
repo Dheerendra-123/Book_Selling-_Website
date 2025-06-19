@@ -21,7 +21,7 @@ const bookSchema = new mongoose.Schema({
       validator: function (v) {
         return /^(\d{10}|\d{13})$/.test(v) || v === "";
       },
-      message: (props) => `${props.value} is not a valid ISBN number!`,
+      message: "Enter a valid ISBN number",
     },
     default: "",
   },
@@ -29,6 +29,12 @@ const bookSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+
+  type: {
+    type: String,
+    required: true,
+  },
+
   condition: {
     type: String,
     required: true,
@@ -45,7 +51,7 @@ const bookSchema = new mongoose.Schema({
     maxlength: 500,
   },
   images: {
-    type: [String], 
+    type: [String],
     required: true,
     validate: {
       validator: function (arr) {

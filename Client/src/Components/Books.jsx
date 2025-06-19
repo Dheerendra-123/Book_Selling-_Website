@@ -7,73 +7,16 @@ import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-import img from '../assets/img.png'
 import Button from '@mui/material/Button'
 import CardActions from '@mui/material/CardActions'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import DiscountIcon from '@mui/icons-material/Discount';
-
+import { useEffect, useState } from 'react'
+import {api} from '../api/api'
 const Books = () => {
 
   const category = ['Novel', 'Fantasy', 'Mathematics', 'Science', 'Cosmos', 'Encylopedia', 'HighSchool', 'Intermediate']
-  const booksInfo = [
-    {
-      title: "The Great Gatsby",
-      author: "F. Scott Fitzgerald",
-      edition: "3rd",
-      price: "₹250",
-      image: img,
-    },
-    {
-      title: "1984",
-      author: "George Orwell",
-      edition: "2nd",
-      price: "₹200",
-      image: img,
-    },
-    {
-      title: "To Kill a Mockingbird",
-      author: "Harper Lee",
-      edition: "1st",
-      price: "₹300",
-      image: img,
-    },
-    {
-      title: "The Alchemist",
-      author: "Paulo Coelho",
-      edition: "4th",
-      price: "₹150",
-      image: img,
-    },
-    {
-      title: "The Great Gatsby",
-      author: "F. Scott Fitzgerald",
-      edition: "3rd",
-      price: "₹250",
-      image: img,
-    },
-    {
-      title: "1984",
-      author: "George Orwell",
-      edition: "2nd",
-      price: "₹200",
-      image: img,
-    },
-    {
-      title: "To Kill a Mockingbird",
-      author: "Harper Lee",
-      edition: "1st",
-      price: "₹300",
-      image: img,
-    },
-    {
-      title: "The Alchemist",
-      author: "Paulo Coelho",
-      edition: "4th",
-      price: "₹150",
-      image: img,
-    }
-  ];
+ 
 
   const navigate = useNavigate();
 
@@ -81,16 +24,39 @@ const Books = () => {
     console.log(`clicked on chip ${type}`);
   }
 
-  const previewHandle = () => {
-    navigate('/book-preview');
+  const previewHandle = (bookID) => {
+    navigate(`/book/${bookID}`);
   }
 
-  const detailsHandle = () => {
-    navigate('/view-details');
+  const detailsHandle = (bookID) => {
+    navigate(`/view-details/${bookID}`);
   }
     const originalPrice = 200;
   const newPrice = 100;
   const discount = ((originalPrice - newPrice) / originalPrice) * 100;
+
+
+const [bookData,setBookData]=useState([]);
+const getAllBooks = async () => {
+  try {
+    const response = await api.get('/api/books', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    setBookData(response.data.getAllBooks);
+  } catch (error) {
+    console.error("Failed to fetch books:", error);
+  }
+};
+
+useEffect(()=>{
+  getAllBooks();
+},[])
+useEffect(() => {
+  console.log(bookData);
+}, [bookData]);
+
   return (
     <>
       <Box
@@ -115,13 +81,13 @@ const Books = () => {
 
         <Box >
           <Grid container spacing={2} pt={3}>
-            {booksInfo.map((book, index) => (
+            {bookData.map((book, index) => (
               <Grid item xs={12} sm={6} md={3} key={index}>
                 <Card>
                   <CardMedia
                     component="img"
                     height="140"
-                    image={book.image}
+                    image={book.images && book.images.length > 0 ? book.images[0] : ''}
                     alt={book.title}
                   />
                   <CardContent>
@@ -170,8 +136,8 @@ const Books = () => {
                     </Stack>
                   </CardContent>
                   <CardActions>
-                    <Button size="small" variant='outlined' onClick={previewHandle}>Preview</Button>
-                    <Button size="small" variant='outlined' onClick={detailsHandle}>View Details</Button>
+                    <Button size="small" variant='outlined' onClick={()=>previewHandle(book._id)}>Preview</Button>
+                    <Button size="small" variant='outlined' onClick={()=>detailsHandle(book._id)}>View Details</Button>
                   </CardActions>
                 </Card>
               </Grid>

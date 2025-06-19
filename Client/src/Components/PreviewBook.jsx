@@ -5,20 +5,21 @@ import Typography from '@mui/material/Typography'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import IconButton from '@mui/material/IconButton';
-import img from '../assets/img.png'
 import Paper from '@mui/material/Paper';
-import hero from '../assets/hero.jpg'
-import { useState } from 'react';
-import Tooltip from '@mui/material/Tooltip';
+import { useEffect, useState } from 'react';
 import Grid from '@mui/material/Grid';
 import Chip from '@mui/material/Chip';
 import Button from '@mui/material/Button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { api } from '../api/api';
+import { CurrencyRupee } from '@mui/icons-material';
 
 const PreviewBook = () => {
-    const images = [img, hero, img, hero, img, hero];
-    const [index, setIndex] = useState(0);
 
+    const { id } = useParams();
+
+    const [index, setIndex] = useState(0);
+    const [images, setImages] = useState([]);
     const handlePrev = () => {
         setIndex((prevIndex) =>
             prevIndex === 0 ? images.length - 1 : prevIndex - 1
@@ -34,11 +35,38 @@ const PreviewBook = () => {
     const handleThumbnailClick = (thumbIndex) => {
         setIndex(thumbIndex);
     };
-     
-    const navigate=useNavigate();
-     const handleViewDetail=()=>{
-      navigate('/view-details');
-     }
+
+    const navigate = useNavigate();
+    const handleViewDetail = () => {
+        navigate(`/view-details/${bookData._id}`);
+    }
+
+    const [bookData, setBookData] = useState([]);
+    const getBook = async () => {
+        try {
+            const response = await api.get(`/api/books/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            setBookData(response.data.bookData);
+        } catch (error) {
+            console.error("Failed to fetch books:", error);
+        }
+    };
+
+    useEffect(() => {
+        getBook();
+    }, [])
+    useEffect(() => {
+        console.log(bookData);
+        if (Array.isArray(bookData.images)) {
+            setImages([...bookData.images]); 
+        }
+    }, [bookData]);
+
+    const discount=(bookData.price/bookData.originalPrice)*100;
+
     return (
         <>
             <Box
@@ -56,18 +84,18 @@ const PreviewBook = () => {
                     <Stack direction='column'>
                         {/* Main Image with Navigation */}
                         <Box position="relative" display="inline-block">
-                            <Paper 
-                                height={400} 
-                                width={600} 
-                                elevation={1} 
-                                component='img' 
+                            <Paper
+                                height={400}
+                                width={600}
+                                elevation={1}
+                                component='img'
                                 src={images[index]}
-                                alt='previewImg' 
+                                alt='previewImg'
                                 sx={{
                                     objectFit: 'fill'
                                 }}
                             />
-                            
+
                             {/* Navigation Buttons on Image */}
                             <IconButton
                                 onClick={handlePrev}
@@ -84,7 +112,7 @@ const PreviewBook = () => {
                             >
                                 <ArrowBackIcon sx={{ fontSize: '35px', color: '#1976D2' }} />
                             </IconButton>
-                            
+
                             <IconButton
                                 onClick={handleNext}
                                 sx={{
@@ -146,92 +174,90 @@ const PreviewBook = () => {
                             </Stack>
                         </Box>
                     </Stack>
-
-                    <Box flexGrow={1} ml={4} sx={{ maxHeight: '500px', overflow: 'hidden',border:'0.5px solid #ebeced',p:'10px',borderRadius:'7px' }}>
-                        <Typography variant='h4' color='primary' gutterBottom sx={{  mb: 2 }}>
+                   
+                    <Box flexGrow={1} ml={4} sx={{ maxHeight: '500px', overflow: 'hidden', border: '0.5px solid #ebeced', p: '10px', borderRadius: '7px' }}>
+                        <Typography variant='h4' color='primary' gutterBottom sx={{ mb: 2 }}>
                             Description
                         </Typography>
-                        
+
                         <Typography variant='body1' color='text.secondary' paragraph sx={{ lineHeight: 1.7, fontSize: '16px', mb: 2 }}>
-                            Immerse yourself in the epic world of Westeros with this captivating tale of power, betrayal, and dragons. A masterpiece that redefined fantasy literature.
-                        </Typography>
-                        
-                        <Typography variant='body1' color='text.secondary' paragraph sx={{ lineHeight: 1.7, fontSize: '16px', mb: 3 }}>
-                            Perfect condition book with original binding and crisp pages. A must-have for any fantasy lover's collection.
+                            {bookData.description}
                         </Typography>
 
                         <Box mt={3} mb={3} p={3} sx={{ backgroundColor: '#f8f9fa', borderRadius: '12px', border: '1px solid #e9ecef' }}>
                             <Grid container spacing={2} >
-                                <Grid item xs={6}>
+                                <Grid size={{xs:6}}>
                                     <Box display="flex" alignItems="center" mb={1.5}>
                                         <Typography variant="subtitle2" color='primary' sx={{ fontWeight: 700, minWidth: '90px', fontSize: '14px' }}>
                                             Title:
                                         </Typography>
                                         <Typography variant="body2" color='text.primary' sx={{ fontSize: '14px', fontWeight: 500 }}>
-                                            Game of Thrones
+                                            {bookData.title}
                                         </Typography>
                                     </Box>
                                 </Grid>
-                                
-                                <Grid item xs={6}>
+
+                                <Grid size={{xs:6}}>
                                     <Box display="flex" alignItems="center" mb={1.5}>
                                         <Typography variant="subtitle2" color='primary' sx={{ fontWeight: 700, minWidth: '90px', fontSize: '14px' }}>
                                             Author:
                                         </Typography>
                                         <Typography variant="body2" color='text.primary' ml={1} sx={{ fontSize: '14px', fontWeight: 500 }}>
-                                            George R.R. Martin
+                                           {bookData.author}
                                         </Typography>
                                     </Box>
                                 </Grid>
-                                
-                                <Grid item xs={6}>
+
+                                <Grid size={{xs:6}}>
                                     <Box display="flex" alignItems="center" mb={1.5}>
                                         <Typography variant="subtitle2" color='primary' sx={{ fontWeight: 700, minWidth: '90px', fontSize: '14px' }}>
                                             Price:
                                         </Typography>
-                                        <Typography variant="body2" color='success.main' ml={1} sx={{ fontSize: '16px', fontWeight: 700 }}>
-                                            ₹200
+                                         <CurrencyRupee style={{fontSize:"18px"}}></CurrencyRupee>  
+                                        <Typography variant="body1" color='success.main'  >
+                                         {bookData.price}
                                         </Typography>
                                     </Box>
                                 </Grid>
-                                
-                                <Grid item xs={6}>
+
+                                <Grid size={{xs:6}}>
                                     <Box display="flex" alignItems="center" mb={1.5}>
                                         <Typography variant="subtitle2" color='primary' sx={{ fontWeight: 700, minWidth: '90px', fontSize: '14px' }}>
                                             Original:
                                         </Typography>
-                                        <Typography variant="body2" color='text.secondary' ml={1} sx={{ fontSize: '14px', textDecoration: 'line-through' }}>
-                                            ₹400
+                                         <CurrencyRupee style={{fontSize:"18px"}}></CurrencyRupee>  
+                                        <Typography variant="body1" color='text.secondary'  sx={{textDecoration: 'line-through' }}>
+                                            {bookData.originalPrice}
                                         </Typography>
-                                        <Chip label="50% OFF" size="small" variant='outlined' color="error" sx={{ ml: 1, height: '20px', fontSize: '11px' }} />
+                                        <Chip label={`${discount}% off`} size="small" variant='outlined' color="error" sx={{ ml: 1, height: '20px', fontSize: '11px' }} />
                                     </Box>
                                 </Grid>
-                                
-                                <Grid item xs={6}>
+
+                                <Grid size={{xs:6}}>
                                     <Box display="flex" alignItems="center" mb={1.5}>
                                         <Typography variant="subtitle2" color='primary' sx={{ fontWeight: 700, minWidth: '90px', fontSize: '14px' }}>
                                             Category:
                                         </Typography>
-                                        <Chip 
-                                            label="Fantasy" 
-                                            size="small" 
-                                            variant="outlined" 
+                                        <Chip
+                                            label="Fantasy"
+                                            size="small"
+                                            variant="outlined"
                                             color="primary"
                                             sx={{ height: '24px', fontSize: '12px' }}
                                         />
                                     </Box>
                                 </Grid>
-                                
-                                <Grid item xs={6}>
+
+                                <Grid size={{xs:6}}>
                                     <Box display="flex" alignItems="center" mb={1.5}>
                                         <Typography variant="subtitle2" color='primary' sx={{ fontWeight: 700, minWidth: '90px', fontSize: '14px' }}>
                                             Condition:
                                         </Typography>
-                                        <Chip 
-                                            label="Like New" 
-                                            size='small' 
+                                        <Chip
+                                            label="Like New"
+                                            size='small'
                                             variant='outlined'
-                                           
+
                                             color='success'
                                             sx={{ height: '24px', fontSize: '12px', fontWeight: 600 }}
                                         />
@@ -241,9 +267,9 @@ const PreviewBook = () => {
                         </Box>
 
                         <Box display='flex' justifyContent='center' mt={3}>
-                            <Button 
-                                variant='contained' 
-                                color='primary' 
+                            <Button
+                                variant='contained'
+                                color='primary'
                                 size="medium"
                                 onClick={handleViewDetail}
                             >

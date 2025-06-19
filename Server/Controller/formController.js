@@ -8,6 +8,7 @@ export const formController = async (req, res) => {
     edition,
     isbn,
     category,
+    type,
     condition,
     price,
     originalPrice,
@@ -19,22 +20,31 @@ export const formController = async (req, res) => {
     city,
     pinCode,
   } = req.body;
+
   try {
-      if (!req.file) {
-    return res.json({ message: "No file uploaded", success: false,status:400 });
-  }
-    const cloudinaryResult = await uploadToCloudinary(req.file.path);
+    if (!req.files || req.files.length === 0) {
+      return res.json({ message: "No files uploaded", success: false, status: 400 });
+    }
+
+    // Upload all images to Cloudinary
+    const uploadPromises = req.files.map(file => uploadToCloudinary(file.path));
+    const cloudinaryResults = await Promise.all(uploadPromises);
+
+    // Extract public_id or url from Cloudinary results
+    const urls = cloudinaryResults.map(result => result.url);
+
     const newForm = await formModel.create({
       title,
       author,
       edition,
       isbn,
       category,
+      type,
       condition,
       price,
       originalPrice,
       description,
-      image:cloudinaryResult.public_id,
+      images: urls, 
       isSold,
       sellerName,
       email,
@@ -42,11 +52,20 @@ export const formController = async (req, res) => {
       city,
       pinCode,
     });
-    console.log("Book Form",newForm);
-    res.json({message:"Book Form Created Successfullt",sucess:true,status:200})
-    removeLocalFile(req.file.path);
+
+    console.log("Book Form", newForm);
+
+    res.json({
+      message: "Book Form Created Successfully",
+      success: true,
+      status: 200
+    });
+
+    // Cleanup local files
+    req.files.forEach(file => removeLocalFile(file.path));
+
   } catch (error) {
     console.log(error);
-    res.json({message:error,success:false,status:400});
+    res.json({ message: error.message, success: false, status: 400 });
   }
 };

@@ -6,15 +6,13 @@ import { Container } from '@mui/system'
 import { useNavigate } from 'react-router-dom'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import SellIcon from '@mui/icons-material/Sell'
-import TrendingUpIcon from '@mui/icons-material/TrendingUp'
-import LocalOfferIcon from '@mui/icons-material/LocalOffer'
 import VerifiedIcon from '@mui/icons-material/Verified'
 
 const HeroSection = () => {
     const navigate = useNavigate()
 
     const handleSellClick = () => {
-        navigate('/sell')
+        navigate('/sell-form')
     }
 
     const handleBuyClick = () => {
@@ -26,7 +24,8 @@ const HeroSection = () => {
             sx={{ 
                 backgroundColor: '#fafafa',
                 pt: 3,
-                pb: 6
+                pb: 2,
+                maxHeight:'100vh'
             }}
         >
             <Container maxWidth="xl">
@@ -152,66 +151,10 @@ const HeroSection = () => {
                                 },
                                 transition: 'all 0.3s ease'
                             }}
+                            
                         >
                             Sell Your Books
                         </Button>
-                    </Box>
-
-                    {/* Features Section */}
-                    <Box sx={{ 
-                        display: 'flex', 
-                        gap: { xs: 2, md: 4 }, 
-                        flexWrap: 'wrap',
-                        justifyContent: 'center',
-                        mb: 4
-                    }}>
-                        <Box sx={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: 1.5,
-                            backgroundColor: '#f8fafc',
-                            px: 3,
-                            py: 2,
-                            borderRadius: 2,
-                            border: '1px solid #e2e8f0'
-                        }}>
-                            <LocalOfferIcon sx={{ color: '#10b981', fontSize: 24 }} />
-                            <Typography variant="body1" sx={{ color: '#374151', fontWeight: 600 }}>
-                                Best Prices
-                            </Typography>
-                        </Box>
-                        
-                        <Box sx={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: 1.5,
-                            backgroundColor: '#f8fafc',
-                            px: 3,
-                            py: 2,
-                            borderRadius: 2,
-                            border: '1px solid #e2e8f0'
-                        }}>
-                            <TrendingUpIcon sx={{ color: '#f59e0b', fontSize: 24 }} />
-                            <Typography variant="body1" sx={{ color: '#374151', fontWeight: 600 }}>
-                                Quick Sales
-                            </Typography>
-                        </Box>
-                        
-                        <Box sx={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            gap: 1.5,
-                            backgroundColor: '#f8fafc',
-                            px: 3,
-                            py: 2,
-                            borderRadius: 2,
-                            border: '1px solid #e2e8f0'
-                        }}>
-                            <VerifiedIcon sx={{ color: '#6366f1', fontSize: 24 }} />
-                            <Typography variant="body1" sx={{ color: '#374151', fontWeight: 600 }}>
-                                Verified Sellers
-                            </Typography>
-                        </Box>
                     </Box>
 
                     {/* Bottom Description */}
@@ -223,13 +166,7 @@ const HeroSection = () => {
                         maxWidth: 800,
                         textAlign: 'center'
                     }}>
-                        <Typography variant="h6" gutterBottom sx={{ 
-                            fontWeight: 700,
-                            color: '#1f2937',
-                            mb: 2
-                        }}>
-                            🌱 Why Choose Our Second-Hand Book Marketplace?
-                        </Typography>
+                    
                         <Typography variant="body1" sx={{ 
                             color: '#6b7280',
                             lineHeight: 1.7,
@@ -238,7 +175,7 @@ const HeroSection = () => {
                             We connect book lovers across the community, making it easy to find your next great read 
                             while giving old books new life. <strong>Sustainable, affordable, and supporting local readers!</strong>
                         </Typography>
-                    </Box>
+                    </Box> 
                 </Box>
             </Container>
         </Box>

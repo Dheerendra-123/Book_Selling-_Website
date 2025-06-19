@@ -5,6 +5,7 @@ import cors from 'cors'
 import 'dotenv/config'
 import userRouter from './Routes/userRoutes.js'
 import formRoutes from './Routes/formRoutes.js'
+import dataRoutes from './Routes/dataRoutes.js'
 const PORT=process.env.PORT;
 
 const app=express();
@@ -42,6 +43,8 @@ app.get('/',(req,res)=>{
 
 app.use('/api/user',userRouter)
 app.use('/api/books',formRoutes)
+app.use('/api',dataRoutes)
+
 
 
 app.listen(PORT,()=>{

@@ -44,7 +44,7 @@ const uploadToCloudinary = async (filePath) => {
       folder: 'lostAndFound',
       use_filename: true
     });
-    console.log(result);
+    // console.log(result);
     
     return {
       url: result.secure_url,

@@ -4,6 +4,6 @@ import { formController } from '../Controller/formController.js';
 import { upload } from '../Services/CloudinaryUpload.js';
 const router=express.Router();
 
-router.post('/sell',isAuthenticated, upload.single('image'),formController)
+router.post('/sell-form',isAuthenticated, upload.array('images', 4),formController)
 
 export default router;
