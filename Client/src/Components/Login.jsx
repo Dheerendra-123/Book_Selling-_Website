@@ -24,6 +24,7 @@ import { handleError, handleSuccess } from '../Utils/Tostify';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Link, useNavigate } from 'react-router-dom';
 
+
 const Login = () => {
 
     const [isLoading, setIsLoading] = useState(false);
@@ -50,29 +51,43 @@ const Login = () => {
             ...formData, [name]: value
         })
     }
+
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
         try {
             const response = await api.post(`/api/user/login`, formData);
+
             if (response.data.success) {
-                handleSuccess("User Logged In Sucessfully")
+
                 localStorage.setItem('token', response.data.token);
-                setTimeout(() => {
-                    navigate('/home');
-                }, 100);
-            }
-            else {
-                if (response.data.success == false)
-                    handleError(response.data.message)
+                
+
+                const selectedRole = localStorage.getItem('selectedRole');
+                // localStorage.removeItem('selectedRole'); // cleanup
+
+                if (selectedRole === 'seller') {
+                    navigate('/sell-form');
+                } else if (selectedRole === 'buyer') {
+                    navigate('/books');
+                } else {
+                    navigate('/home'); // fallback
+                }
+
+                handleSuccess("User Logged In Successfully");
+            } else {
+                handleError(response.data.message);
             }
         } catch (error) {
-            handleError("Server Error Check Your Internet Connection");
-            console.log(error)
+            handleError("Server Error: Check Your Internet Connection");
+            console.error(error);
         } finally {
             setIsLoading(false);
         }
-    }
+    };
+
 
     return (
         <Container maxWidth="sm" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '90vh' }}>
@@ -151,15 +166,15 @@ const Login = () => {
 
                         </FormControl>
                         <Button type='submit' variant='contained' size='large'>
-                            {isLoading ? <CircularProgress size={25} color='gray'/> : 'Login'}
+                            {isLoading ? <CircularProgress size={25} color='gray' /> : 'Login'}
                         </Button>
-                        <Box sx={{textAlign:'center'}}>
-                        <Typography variant='h7' color='grey'>
-                            Dont have account? 
-                            <Typography variant='h7' color='blue' sx={{ml:'5px'}} >
-                                <Link to='/signup' style={{textDecoration:'none'}}>SignUp here</Link>
+                        <Box sx={{ textAlign: 'center' }}>
+                            <Typography variant='h7' color='grey'>
+                                Dont have account?
+                                <Typography variant='h7' color='blue' sx={{ ml: '5px' }} >
+                                    <Link to='/signup' style={{ textDecoration: 'none' }}>SignUp here</Link>
+                                </Typography>
                             </Typography>
-                        </Typography>
                         </Box>
                     </Stack>
                 </Box>

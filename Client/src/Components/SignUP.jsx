@@ -27,15 +27,16 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const SignUP = () => {
 
-    const [isloading,setIsLoding]=useState(false);
+    const [isloading, setIsLoding] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
-        password: ''
+        password: '',
+        role: localStorage.getItem('selectedRole')
     });
 
     const [showPassword, setShowPassword] = React.useState(false);
-     const navigate = useNavigate(); 
+    const navigate = useNavigate();
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
     const handleMouseDownPassword = (event) => {
@@ -56,20 +57,30 @@ const SignUP = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoding(true);
+
         try {
-            const response = await api.post(`/api/user/signup`, formData);
-            if (response.data.sucess) {
-                handleSuccess("User Registerd Sucessfully")
+            const role = localStorage.getItem('selectedRole') || 'buyer';
+            const payload = { ...formData, role };
+
+            const response = await api.post(`/api/user/signup`, payload);
+
+            if (response.data.success) {
+                handleSuccess("User Registered Successfully");
+
+                localStorage.removeItem('selectedRole');
+
                 navigate('/login');
-            }
-            else {
-                if(response.data.sucess==false)
-                handleError(response.data.message)
+            } else {
+                handleError(response.data.message || "Signup failed");
             }
         } catch (error) {
-            handleError(error);
+            handleError("Something went wrong. Try again later.");
+            console.error(error);
+        } finally {
+            setIsLoding(false);
         }
-    }
+    };
+
 
     return (
         <Container maxWidth="sm" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '90vh' }}>
@@ -117,65 +128,65 @@ const SignUP = () => {
                             }}
                         />
 
-                    <TextField
-                        required
-                        label="email"
-                        name='email'
-                        value={formData.email}
-                        onChange={handleChange}
-                        autoComplete='email'
-                        InputProps={{
+                        <TextField
+                            required
+                            label="email"
+                            name='email'
+                            value={formData.email}
+                            onChange={handleChange}
+                            autoComplete='email'
+                            InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <EmailIcon/>
+                                        <EmailIcon />
                                     </InputAdornment>
                                 ),
                             }}
-                    >
+                        >
 
-                    </TextField>
+                        </TextField>
 
-                    <FormControl sx={{ width: '100%' }} variant="outlined">
-                        <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
-                        <OutlinedInput
-                            id="outlined-adornment-password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            type={showPassword ? 'text' : 'password'}
-                            endAdornment={
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        aria-label={
-                                            showPassword ? 'hide the password' : 'display the password'
-                                        }
-                                        onClick={handleClickShowPassword}
-                                        onMouseDown={handleMouseDownPassword}
-                                        onMouseUp={handleMouseUpPassword}
-                                        edge="end"
-                                    >
-                                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                                    </IconButton>
-                                </InputAdornment>
-                            }
-                            label="Password"
-                        />
+                        <FormControl sx={{ width: '100%' }} variant="outlined">
+                            <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                            <OutlinedInput
+                                id="outlined-adornment-password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                type={showPassword ? 'text' : 'password'}
+                                endAdornment={
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label={
+                                                showPassword ? 'hide the password' : 'display the password'
+                                            }
+                                            onClick={handleClickShowPassword}
+                                            onMouseDown={handleMouseDownPassword}
+                                            onMouseUp={handleMouseUpPassword}
+                                            edge="end"
+                                        >
+                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                }
+                                label="Password"
+                            />
 
-                    </FormControl>
-                    <Button type='submit' variant='contained' size='large'>
-                        {isloading?<CircularProgress size='medium'/>:'SignUP'}
-                    </Button>
-                            <Box sx={{textAlign:'center'}}>
-                        <Typography variant='h7' color='grey'>
-                            Already have account? 
-                            <Typography variant='h7' color='blue' sx={{ml:'5px'}} >
-                                <Link to='/login' style={{textDecoration:'none'}}>Login here</Link>
+                        </FormControl>
+                        <Button type='submit' variant='contained' size='large'   disabled={isloading}>
+                             {isloading ? <CircularProgress size={25} color='inherit' /> : 'Sign Up'}
+                        </Button>
+                        <Box sx={{ textAlign: 'center' }}>
+                            <Typography variant='h7' color='grey'>
+                                Already have account?
+                                <Typography variant='h7' color='blue' sx={{ ml: '5px' }} >
+                                    <Link to='/login' style={{ textDecoration: 'none' }}>Login here</Link>
+                                </Typography>
                             </Typography>
-                        </Typography>
                         </Box>
-                </Stack>
-            </Box>
-        </Paper>
+                    </Stack>
+                </Box>
+            </Paper>
         </Container >
     )
 }

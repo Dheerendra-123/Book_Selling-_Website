@@ -1,13 +1,19 @@
 import React from 'react'
 import Navbar from '../Components/Nabar'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 const Layout = () => {
+  const location = useLocation();
+
+  const hideNavbarPaths = ['/home','/','/not-allowed'];
+
+  const shouldHideNavbar = hideNavbarPaths.includes(location.pathname);
+
   return (
     <>
-    <Navbar/>
-    <Outlet/>
+      {!shouldHideNavbar && <Navbar />}
+      <Outlet />
     </>
-  )
-}
+  );
+};
 
 export default Layout

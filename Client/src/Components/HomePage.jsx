@@ -11,13 +11,17 @@ import VerifiedIcon from '@mui/icons-material/Verified'
 const HeroSection = () => {
     const navigate = useNavigate()
 
-    const handleSellClick = () => {
-        navigate('/sell-form')
-    }
+const handleBuyClick = () => {
+  localStorage.setItem('selectedRole', 'buyer');
 
-    const handleBuyClick = () => {
-        navigate('/books')
-    }
+  navigate('/login');
+};
+
+const handleSellClick = () => {
+  localStorage.setItem('selectedRole', 'seller');
+
+  navigate('/login');
+};
 
     return (
         <Box 
@@ -125,7 +129,7 @@ const HeroSection = () => {
                                 transition: 'all 0.3s ease'
                             }}
                         >
-                            Browse Books
+                            Browse/Buy Books
                         </Button>
 
                         <Button

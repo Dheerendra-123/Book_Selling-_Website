@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const signUpController = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password} = req.body;
   if (!name || !email || !password) {
     return res.json({
       message: "Please enter all fields",
@@ -24,6 +24,7 @@ export const signUpController = async (req, res) => {
       name,
       email,
       password: hashPassword,
+      role
     });
     console.log("User Created Successfully", newUser);
     return res.json({
@@ -41,7 +42,7 @@ export const signUpController = async (req, res) => {
 
 
 export const loginController = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password} = req.body;
   if (!email || !password) {
     return res.json({
       message: "All Fields are required",

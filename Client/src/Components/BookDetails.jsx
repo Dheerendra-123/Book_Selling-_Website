@@ -4,8 +4,6 @@ import {
   Chip,
   Grid,
   Card,
-  CardContent,
-  Divider,
   Paper,
   Stack,
   Button,
@@ -19,15 +17,11 @@ import {
   Person,
   Category,
   LibraryBooks,
-  CurrencyRupee,
-  LocationOn,
-  Email,
   Info,
   ShoppingCart,
   Bookmark,
   Share,
   Star,
-  LocalOffer,
   MenuBook,
   ContactMail,
   Place
@@ -35,11 +29,46 @@ import {
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { api } from '../api/api';
+import { useDispatch, useSelector } from 'react-redux';
+import { handleError, handleSuccess } from '../Utils/Tostify';
+import { setCartItems } from '../../redux/cartSlice';
 
 const BookDetails = () => {
   const { id } = useParams();
   const [bookData, setBookData] = useState({});
   const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const cartItems = useSelector((state) => state.cart.items);
+
+
+const handleAddToCart = async () => {
+  try {
+    if (!bookData || !bookData._id) {
+      handleError('Book data not available');
+      return;
+    }
+
+    const alreadyInCart = cartItems.find(item => item._id === bookData._id);
+    if (alreadyInCart) {
+      handleError('Item is already in cart');
+    } else {
+      const token = localStorage.getItem('token');
+      const res = await api.post('/api/cart', bookData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Convert backend response to expected Redux format
+      const updatedItems = res.data.items.map(i => i.productId); // populated BookForm
+      dispatch(setCartItems(updatedItems));
+      handleSuccess('Item added to cart');
+    }
+  } catch (error) {
+    console.error('Error adding to cart:', error);
+    handleError('Failed to add item to cart');
+  }
+};
+
+
 
   const getBook = async () => {
     try {
@@ -89,11 +118,11 @@ const BookDetails = () => {
       >
         <Grid container spacing={4}>
           {/* Book Image Placeholder */}
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Box
-             component="img"
-                src={bookData.images[0]} 
-                alt="Book Image"
+              component="img"
+              src={bookData.images[0]}
+              alt="Book Image"
               sx={{
                 width: 300,
                 height: 400,
@@ -167,7 +196,7 @@ const BookDetails = () => {
                 label={bookData.category}
                 color="info"
                 variant="outlined"
-               size="small"
+                size="small"
                 icon={<Category />}
               />
               <Chip
@@ -205,7 +234,7 @@ const BookDetails = () => {
                 </Box>
 
                 {discountPercentage > 0 && (
-                    <Chip variant='outlined' size='small' color='error' label={`${discountPercentage}% off` }></Chip>
+                  <Chip variant='outlined' size='small' color='error' label={`${discountPercentage}% off`}></Chip>
                 )}
               </Stack>
             </Box>
@@ -240,6 +269,7 @@ const BookDetails = () => {
                     textTransform: 'none',
                     fontSize: '0.8rem'
                   }}
+                  onClick={handleAddToCart}
                 >
                   Add to Cart
                 </Button>
@@ -399,9 +429,9 @@ const BookDetails = () => {
                 </Typography>
               </Box>
 
-              <Stack spacing={2}>
+              <Stack spacing={1}>
                 <Box>
-                  <Typography variant="h6" color="text.primary" sx={{ mb: 0.5 }}>
+                  <Typography variant="h6" color="text.primary" >
                     PIN Code
                   </Typography>
                   <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
@@ -410,7 +440,7 @@ const BookDetails = () => {
                 </Box>
 
                 <Box>
-                  <Typography variant="h6" color="text.primary" sx={{ mb: 0.5 }}>
+                  <Typography variant="h6" color="text.primary" >
                     City & State
                   </Typography>
                   <Typography variant="body1" color="text.primary" sx={{ fontWeight: 600 }}>

@@ -15,77 +15,89 @@ import BookDetails from './Components/BookDetails';
 import PreviewBook from './Components/PreviewBook';
 import Cart from './Components/Cart';
 import SellBookForm from './Components/SellBookForm';
+import PublicOnlyRoute from './Utils/PublicOnlyRoute';
+// import NotAllowed from './Components/NotAllowed';
 
 const App = () => {
-  
-const router = createBrowserRouter([
- {
-    path: '/',
-    element: <Layout />, 
-    children: [
-      {
-        index: true,
-        element: <Navigate to="/login" replace />,
-      },
-      {
-        path: 'home',
-        element: (
-          <ProtectedRoute>
-            <HomePage />
-          </ProtectedRoute>
-        ),
-      },
-       {
-        path: 'view-details/:id',
-        element: (
-          <ProtectedRoute>
-            <BookDetails />
-          </ProtectedRoute>
-        ),
-      },
-       {
-        path: 'book/:id',
-        element: (
-          <ProtectedRoute>
-            <PreviewBook />
-          </ProtectedRoute>
-        ),
-      },
-       {
-        path: 'cart',
-        element: (
-          <ProtectedRoute>
-            <Cart />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: 'books',
-        element: (
-          <ProtectedRoute>
-            <Books />
-          </ProtectedRoute>
-        ),
-      },
-       {
-        path: 'sell-form',
-        element: (
-          <ProtectedRoute>
-            <SellBookForm />
-          </ProtectedRoute>
-        ),
-      },
-    ],
-  },
-  {
-    path: '/signup',
-    element: <SignUP />,
-  },
-  {
-    path: '/login',
-    element: <Login />,
-  },
-]);
+
+  const router = createBrowserRouter([
+    {
+      path: '/',
+      element: <Layout />,
+      children: [
+        {
+          index: true,
+          element: <Navigate to="/home" replace />,
+        },
+        {
+          path: 'home',
+          element: (
+            <PublicOnlyRoute>
+              <HomePage />
+            </PublicOnlyRoute>
+          ),
+        },
+        {
+          path: 'view-details/:id',
+          element: (
+            <ProtectedRoute>
+              <BookDetails />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'book/:id',
+          element: (
+            <ProtectedRoute>
+              <PreviewBook />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'cart',
+          element: (
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'books',
+          element: (
+            <ProtectedRoute>
+              <Books />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: 'sell-form',
+          element: (
+            <ProtectedRoute>
+              <SellBookForm />
+            </ProtectedRoute>
+          ),
+        },
+        // {
+        //   path: 'not-allowed', 
+        //   element: <NotAllowed />,
+        // },
+      ],
+    },
+    {
+      path: '/signup',
+      element:
+        <SignUP />,
+
+
+    },
+    {
+      path: '/login',
+      element: (<PublicOnlyRoute>
+        <Login />
+      </PublicOnlyRoute>
+      )
+    },
+  ]);
   return (
     <>
       <RouterProvider router={router} />
