@@ -16,7 +16,13 @@ import PreviewBook from './Components/PreviewBook';
 import Cart from './Components/Cart';
 import SellBookForm from './Components/SellBookForm';
 import PublicOnlyRoute from './Utils/PublicOnlyRoute';
-// import NotAllowed from './Components/NotAllowed';
+import Dashboard from './Components/Dashbord';
+import WishList from './Components/wishList';
+import Analytics from './Components/Analytics';
+import MyOrders from './Components/MyOrders';
+import BooksListed from './Components/BooksListed';
+import BooksPurchased from './Components/BooksPurchased';
+import ConfirmOrder from './Components/ConfirmOrder';
 
 const App = () => {
 
@@ -77,10 +83,70 @@ const App = () => {
             </ProtectedRoute>
           ),
         },
-        // {
-        //   path: 'not-allowed', 
-        //   element: <NotAllowed />,
-        // },
+
+
+        {
+          path: '/dashboard',
+          element: (
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          ),
+          children: [
+            {
+              index: true,
+              element: (
+                <ProtectedRoute>
+                  <Analytics />
+                </ProtectedRoute>
+
+              )
+            },
+        
+           
+            {
+              path: 'wishlist', 
+              element: (
+                <ProtectedRoute>
+                  <WishList />
+                </ProtectedRoute>
+              ),
+            },
+              {
+              path: 'myOrders', 
+              element: (
+                <ProtectedRoute>
+                  <MyOrders />
+                </ProtectedRoute>
+              ),
+            },
+             {
+              path: 'booksListed', 
+              element: (
+                <ProtectedRoute>
+                  <BooksListed />
+                </ProtectedRoute>
+              ),
+            },
+             {
+              path: 'booksBuyed', 
+              element: (
+                <ProtectedRoute>
+                  <BooksPurchased />
+                </ProtectedRoute>
+              ),
+            },
+               {
+              path: 'confirm', 
+              element: (
+                <ProtectedRoute>
+                  <ConfirmOrder />
+                </ProtectedRoute>
+              ),
+            },
+          ],
+        }
+     
       ],
     },
     {

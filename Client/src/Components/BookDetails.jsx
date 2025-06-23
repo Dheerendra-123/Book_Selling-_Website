@@ -32,6 +32,7 @@ import { api } from '../api/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { handleError, handleSuccess } from '../Utils/Tostify';
 import { setCartItems } from '../../redux/cartSlice';
+import DiscountIcon from '@mui/icons-material/Discount';
 
 const BookDetails = () => {
   const { id } = useParams();
@@ -69,6 +70,19 @@ const handleAddToCart = async () => {
 };
 
 
+const handleAddToWishList=async()=>{
+    try{
+      const token = localStorage.getItem('token');
+      const res=await api.post('/api/wishlist/add',{ bookId: bookData._id },{
+          headers:{Authorization:`Bearer ${token}`}
+      })
+      console.log(res.data);
+      handleSuccess(res.data.message)
+    }catch(error){
+      console.log(error);
+    }
+}
+
 
   const getBook = async () => {
     try {
@@ -85,7 +99,7 @@ const handleAddToCart = async () => {
       setLoading(false);
     }
   };
-
+  // console.log(bookData._id)
   useEffect(() => {
     getBook();
   }, []);
@@ -165,7 +179,7 @@ const handleAddToCart = async () => {
               {/* Action buttons */}
               <Stack direction="row" spacing={1}>
                 <Tooltip title="Add to Wishlist">
-                  <IconButton size="large" sx={{ bgcolor: 'grey.50' }}>
+                  <IconButton size="large" sx={{ bgcolor: 'grey.50' }} onClick={handleAddToWishList}>
                     <Bookmark />
                   </IconButton>
                 </Tooltip>
@@ -234,7 +248,7 @@ const handleAddToCart = async () => {
                 </Box>
 
                 {discountPercentage > 0 && (
-                  <Chip variant='outlined' size='small' color='error' label={`${discountPercentage}% off`}></Chip>
+                  <Chip icon={<DiscountIcon />} variant='outlined' size='small' color='success' label={`${discountPercentage}% off`} sx={{p:'3px'}}></Chip>
                 )}
               </Stack>
             </Box>

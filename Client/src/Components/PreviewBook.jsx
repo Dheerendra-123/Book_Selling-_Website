@@ -13,7 +13,7 @@ import Button from '@mui/material/Button';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api/api';
 import { CurrencyRupee } from '@mui/icons-material';
-
+import DiscountIcon from '@mui/icons-material/Discount';
 const PreviewBook = () => {
 
     const { id } = useParams();
@@ -61,11 +61,9 @@ const PreviewBook = () => {
     useEffect(() => {
         console.log(bookData);
         if (Array.isArray(bookData.images)) {
-            setImages([...bookData.images]); 
+            setImages([...bookData.images]);
         }
     }, [bookData]);
-
-    const discount=(bookData.price/bookData.originalPrice)*100;
 
     return (
         <>
@@ -174,7 +172,7 @@ const PreviewBook = () => {
                             </Stack>
                         </Box>
                     </Stack>
-                   
+
                     <Box flexGrow={1} ml={4} sx={{ maxHeight: '500px', overflow: 'hidden', border: '0.5px solid #ebeced', p: '10px', borderRadius: '7px' }}>
                         <Typography variant='h4' color='primary' gutterBottom sx={{ mb: 2 }}>
                             Description
@@ -186,7 +184,7 @@ const PreviewBook = () => {
 
                         <Box mt={3} mb={3} p={3} sx={{ backgroundColor: '#f8f9fa', borderRadius: '12px', border: '1px solid #e9ecef' }}>
                             <Grid container spacing={2} >
-                                <Grid size={{xs:6}}>
+                                <Grid size={{ xs: 6 }}>
                                     <Box display="flex" alignItems="center" mb={1.5}>
                                         <Typography variant="subtitle2" color='primary' sx={{ fontWeight: 700, minWidth: '90px', fontSize: '14px' }}>
                                             Title:
@@ -197,43 +195,52 @@ const PreviewBook = () => {
                                     </Box>
                                 </Grid>
 
-                                <Grid size={{xs:6}}>
+                                <Grid size={{ xs: 6 }}>
                                     <Box display="flex" alignItems="center" mb={1.5}>
                                         <Typography variant="subtitle2" color='primary' sx={{ fontWeight: 700, minWidth: '90px', fontSize: '14px' }}>
                                             Author:
                                         </Typography>
                                         <Typography variant="body2" color='text.primary' ml={1} sx={{ fontSize: '14px', fontWeight: 500 }}>
-                                           {bookData.author}
+                                            {bookData.author}
                                         </Typography>
                                     </Box>
                                 </Grid>
 
-                                <Grid size={{xs:6}}>
+                                <Grid size={{ xs: 6 }}>
                                     <Box display="flex" alignItems="center" mb={1.5}>
                                         <Typography variant="subtitle2" color='primary' sx={{ fontWeight: 700, minWidth: '90px', fontSize: '14px' }}>
                                             Price:
                                         </Typography>
-                                         <CurrencyRupee style={{fontSize:"18px"}}></CurrencyRupee>  
+                                        <CurrencyRupee style={{ fontSize: "18px" }}></CurrencyRupee>
                                         <Typography variant="body1" color='success.main'  >
-                                         {bookData.price}
+                                            {bookData.price}
                                         </Typography>
                                     </Box>
                                 </Grid>
 
-                                <Grid size={{xs:6}}>
+                                <Grid size={{ xs: 6 }} >
                                     <Box display="flex" alignItems="center" mb={1.5}>
                                         <Typography variant="subtitle2" color='primary' sx={{ fontWeight: 700, minWidth: '90px', fontSize: '14px' }}>
                                             Original:
                                         </Typography>
-                                         <CurrencyRupee style={{fontSize:"18px"}}></CurrencyRupee>  
-                                        <Typography variant="body1" color='text.secondary'  sx={{textDecoration: 'line-through' }}>
+                                        <CurrencyRupee style={{ fontSize: "18px" }}></CurrencyRupee>
+                                        <Typography variant="body1" color='text.secondary' sx={{ textDecoration: 'line-through',mr:'10px' }}>
                                             {bookData.originalPrice}
                                         </Typography>
-                                        <Chip label={`${discount}% off`} size="small" variant='outlined' color="error" sx={{ ml: 1, height: '20px', fontSize: '11px' }} />
+                                        <Chip
+                                            icon={<DiscountIcon />}
+                                            size='small'
+                                            label={`${Math.round((1 - bookData.price / bookData.originalPrice) * 100)}% OFF`}
+                                            color="success"
+                                            variant='outlined'
+                                            sx={{
+                                                fontWeight: 'bold',
+                                            }}
+                                        />
                                     </Box>
                                 </Grid>
 
-                                <Grid size={{xs:6}}>
+                                <Grid size={{ xs: 6 }}>
                                     <Box display="flex" alignItems="center" mb={1.5}>
                                         <Typography variant="subtitle2" color='primary' sx={{ fontWeight: 700, minWidth: '90px', fontSize: '14px' }}>
                                             Category:
@@ -248,7 +255,7 @@ const PreviewBook = () => {
                                     </Box>
                                 </Grid>
 
-                                <Grid size={{xs:6}}>
+                                <Grid size={{ xs: 6 }}>
                                     <Box display="flex" alignItems="center" mb={1.5}>
                                         <Typography variant="subtitle2" color='primary' sx={{ fontWeight: 700, minWidth: '90px', fontSize: '14px' }}>
                                             Condition:

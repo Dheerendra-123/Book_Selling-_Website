@@ -17,8 +17,7 @@ import { handleSuccess } from '../Utils/Tostify';
 import { useSelector, useDispatch } from 'react-redux';
 import { setCartItems } from '../../redux/cartSlice'; // ✅ import setCartItems
 import { api } from '../api/api';
-import { jwtDecode } from 'jwt-decode';
-import { LogoutOutlined } from '@mui/icons-material';
+import { LogoutOutlined, SellOutlined } from '@mui/icons-material';
 
 
 
@@ -66,8 +65,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const PrimarySearchAppBar = () => {
-const role = localStorage.getItem('selectedRole');
-
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -80,14 +77,9 @@ const role = localStorage.getItem('selectedRole');
         navigate('/home');
     };
 
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const open = Boolean(anchorEl);
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
+    const handleAccountClick = () => {
+        navigate('/dashboard')
+    }
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -137,9 +129,8 @@ const role = localStorage.getItem('selectedRole');
                         }}
                         onClick={handleLogo}
                     />
-                    {
-                        role!='seller'&&(
-                            <Search>
+
+                    <Search>
                         <SearchIconWrapper>
                             <SearchIcon sx={{ color: '#555' }} />
                         </SearchIconWrapper>
@@ -148,17 +139,42 @@ const role = localStorage.getItem('selectedRole');
                             inputProps={{ 'aria-label': 'search' }}
                         />
                     </Search>
-                        )
-                    }
+
+
 
                     <Box sx={{ flexGrow: 1 }} />
                     <Box
                         sx={{ display: { xs: 'none', md: 'flex' } }}
-                       
+
                         alignItems="center"
                     >
 
-                        {role!='seller'&&(
+                        <IconButton size="large" color="grey"
+                            disableRipple
+                            sx={{
+                                boxShadow: 'none',
+                                '&:hover': {
+                                    boxShadow: 'none',
+                                    backgroundColor: 'transparent',
+                                },
+                                '&:active': {
+                                    boxShadow: 'none',
+                                    backgroundColor: 'transparent',
+                                },
+                            }}
+                            onClick={() => navigate('/sell-form')}
+                        >
+
+                            <SellOutlined
+                                sx={{ fontSize: '26px' }}
+                                onClick={cartHandle}
+                            />
+
+                            <Typography variant="body1" color="text.secondary" ml={1}>
+                                Sell Book
+                            </Typography>
+                        </IconButton>
+
                         <IconButton size="large" color="grey"
                             disableRipple
                             sx={{
@@ -182,8 +198,10 @@ const role = localStorage.getItem('selectedRole');
                             <Typography variant="body1" color="text.secondary" ml={1}>
                                 Cart
                             </Typography>
+
                         </IconButton>
-                        )}
+
+
 
                         <Box>
                             <IconButton
@@ -203,40 +221,45 @@ const role = localStorage.getItem('selectedRole');
                                 aria-controls={open ? 'demo-positioned-menu' : undefined}
                                 aria-haspopup="true"
                                 aria-expanded={open ? 'true' : undefined}
-                                onClick={role === 'seller' ? handleLogout : handleClick}
+                                onClick={handleAccountClick}
                             >
-                                {
-                                    role==='seller'?(<LogoutOutlined sx={{ fontSize: '35px' }}/>):
-                                     <AccountCircleOutlinedIcon sx={{ fontSize: '35px' }}/>
-                                }
-                                
-                               
+
+
+                                <AccountCircleOutlinedIcon sx={{ fontSize: '35px' }} />
+
+
+
                                 <Typography variant="body1" color="text.secondary" ml={1}>
-                                   {role==='seller'? 'Logout':'My Account'}
+                                    My Account
                                 </Typography>
                             </IconButton>
-                      {
-                        role!='seller'&&(
-                                  <Menu
-                                id="demo-positioned-menu"
-                                aria-labelledby="demo-positioned-button"
-                                anchorEl={anchorEl}
-                                open={open}
-                                onClose={handleClose}
-                                anchorOrigin={{
-                                    vertical: 'bottom',
-                                    horizontal: 'right',
+
+
+                            <IconButton size="large" color="grey"
+                                disableRipple
+                                sx={{
+                                    boxShadow: 'none',
+                                    '&:hover': {
+                                        boxShadow: 'none',
+                                        backgroundColor: 'transparent',
+                                    },
+                                    '&:active': {
+                                        boxShadow: 'none',
+                                        backgroundColor: 'transparent',
+                                    },
                                 }}
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'left',
-                                }}
+                                onClick={handleLogout}
                             >
-                                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                                <MenuItem onClick={handleLogout}>Logout</MenuItem>
-                            </Menu>
-                        )
-                      }
+
+                                <LogoutOutlined
+                                    sx={{ fontSize: '30px' }}
+                                />
+
+                                <Typography variant="body1" color="text.secondary" ml={1}>
+                                    Logout
+                                </Typography>
+
+                            </IconButton>
 
                         </Box>
 

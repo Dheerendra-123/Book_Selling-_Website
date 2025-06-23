@@ -33,7 +33,7 @@ export const addToCart = async (req, res) => {
     // Return updated cart with populated book details
     const updatedCart = await cartModel.findOne({ userId }).populate('items.productId');
     res.json(updatedCart);
-    console.log("Cart Item:",updatedCart);
+    console.log("Cart Item Added:",updatedCart);
   } catch (error) {
     res.json({ message: 'Error adding to cart', error });
   }
@@ -45,8 +45,36 @@ export const getCart = async (req, res) => {
     if (!cart) return res.json({ items: [] });
 
     res.json(cart);
-    console.log("Cart Item Fetced->",cart);
+    // console.log("Cart Item Fetced->",cart);
   } catch (error) {
     res.json({ message: 'Error fetching cart', error });
   }
+}
+
+export const removeFromCart = async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    const userId = req.user.id; // or get from token/session if implemented
+
+    const updatedCart = await cartModel.findOneAndUpdate(
+      { userId },
+      { $pull: { items: { _id: itemId } } },
+      { new: true }
+    );
+
+    if (!updatedCart) {
+      return res.json({ message: "Cart not found", success: false });
+    }
+
+    res.json({ message: "Item removed from cart successfully", success: true, cart: updatedCart });
+    console.log("Item removed from cart successfully",updatedCart);
+  } catch (error) {
+    console.error("Error removing cart item:", error);
+    res.json({ message: "Internal server error", success: false });
+  }
 };
+
+
+export const clearCart=async(req,res)=>{
+
+}

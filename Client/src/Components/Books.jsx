@@ -31,9 +31,7 @@ const Books = () => {
   const detailsHandle = (bookID) => {
     navigate(`/view-details/${bookID}`);
   }
-  const originalPrice = 200;
-  const newPrice = 100;
-  const discount = ((originalPrice - newPrice) / originalPrice) * 100;
+
 
 
   const [bookData, setBookData] = useState([]);
@@ -109,7 +107,7 @@ const Books = () => {
                           fontWeight: 500,
                         }}
                       >
-                        ₹{originalPrice}
+                        ₹{book.originalPrice}
                       </Typography>
 
                       {/* New Price */}
@@ -121,14 +119,14 @@ const Books = () => {
                           fontSize: '1.2rem',
                         }}
                       >
-                        ₹{newPrice}
+                        ₹{book.price}
                       </Typography>
 
                       {/* Discount Chip */}
                       <Chip
                         icon={<DiscountIcon />}
                         size='small'
-                        label={`${Math.round(discount)}% OFF`}
+                        label=  {`${Math.round((1 - book.price / book.originalPrice) * 100)}% OFF`}
                         color="success"
                         variant='outlined'
                         sx={{

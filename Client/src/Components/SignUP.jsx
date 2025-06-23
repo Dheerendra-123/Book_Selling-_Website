@@ -32,7 +32,6 @@ const SignUP = () => {
         name: '',
         email: '',
         password: '',
-        role: localStorage.getItem('selectedRole')
     });
 
     const [showPassword, setShowPassword] = React.useState(false);
@@ -59,10 +58,7 @@ const SignUP = () => {
         setIsLoding(true);
 
         try {
-            const role = localStorage.getItem('selectedRole') || 'buyer';
-            const payload = { ...formData, role };
-
-            const response = await api.post(`/api/user/signup`, payload);
+            const response = await api.post(`/api/user/signup`, formData);
 
             if (response.data.success) {
                 handleSuccess("User Registered Successfully");

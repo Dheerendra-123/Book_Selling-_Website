@@ -12,14 +12,12 @@ const HeroSection = () => {
     const navigate = useNavigate()
 
 const handleBuyClick = () => {
-  localStorage.setItem('selectedRole', 'buyer');
-
+localStorage.setItem('selectedRole','buyer');
   navigate('/login');
 };
 
 const handleSellClick = () => {
-  localStorage.setItem('selectedRole', 'seller');
-
+    localStorage.setItem('selectedRole','seller')
   navigate('/login');
 };
 

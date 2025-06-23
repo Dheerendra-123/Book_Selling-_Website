@@ -64,19 +64,10 @@ const Login = () => {
 
                 localStorage.setItem('token', response.data.token);
                 
-
-                const selectedRole = localStorage.getItem('selectedRole');
-                // localStorage.removeItem('selectedRole'); // cleanup
-
-                if (selectedRole === 'seller') {
-                    navigate('/sell-form');
-                } else if (selectedRole === 'buyer') {
-                    navigate('/books');
-                } else {
-                    navigate('/home'); // fallback
-                }
-
                 handleSuccess("User Logged In Successfully");
+                if(localStorage.getItem('selectedRole')==='buyer')
+                navigate('/books')
+            else navigate('/sell-form')
             } else {
                 handleError(response.data.message);
             }
