@@ -23,6 +23,7 @@ import MyOrders from './Components/MyOrders';
 import BooksListed from './Components/BooksListed';
 import BooksPurchased from './Components/BooksPurchased';
 import ConfirmOrder from './Components/ConfirmOrder';
+import Checkout from './Components/Checkout';
 
 const App = () => {
 
@@ -83,7 +84,14 @@ const App = () => {
             </ProtectedRoute>
           ),
         },
-
+        {
+          path: 'checkout',
+          element: (
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          ),
+        },
 
         {
           path: '/dashboard',
@@ -102,42 +110,42 @@ const App = () => {
 
               )
             },
-        
-           
+
+
             {
-              path: 'wishlist', 
+              path: 'wishlist',
               element: (
                 <ProtectedRoute>
                   <WishList />
                 </ProtectedRoute>
               ),
             },
-              {
-              path: 'myOrders', 
+            {
+              path: 'myOrders',
               element: (
                 <ProtectedRoute>
                   <MyOrders />
                 </ProtectedRoute>
               ),
             },
-             {
-              path: 'booksListed', 
+            {
+              path: 'booksListed',
               element: (
                 <ProtectedRoute>
                   <BooksListed />
                 </ProtectedRoute>
               ),
             },
-             {
-              path: 'booksBuyed', 
+            {
+              path: 'booksBuyed',
               element: (
                 <ProtectedRoute>
                   <BooksPurchased />
                 </ProtectedRoute>
               ),
             },
-               {
-              path: 'confirm', 
+            {
+              path: 'confirm',
               element: (
                 <ProtectedRoute>
                   <ConfirmOrder />
@@ -146,9 +154,10 @@ const App = () => {
             },
           ],
         }
-     
+
       ],
     },
+
     {
       path: '/signup',
       element:

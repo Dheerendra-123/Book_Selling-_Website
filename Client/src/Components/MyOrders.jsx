@@ -57,7 +57,7 @@ const MyOrders = () => {
 
       <Grid container spacing={3} mt={3}>
         {sampleOrders.map((order, index) => (
-          <Grid item xs={12} sm={6} md={4} key={order._id}>
+          <Grid size={{xs:12, sm:4 ,md:3 }} key={order._id}>
             <Card sx={{ height: '100%' }}>
               <CardMedia
                 component="img"
@@ -88,23 +88,7 @@ const MyOrders = () => {
                   />
                 </Stack>
 
-                <Typography variant="body2" color="text.secondary" mt={1}>
-                  Purchased: 11/6/2025
-                </Typography>
-
-                <Chip
-                  icon={
-                    order.status === 'Delivered' ? (
-                      <CheckCircle />
-                    ) : (
-                      <HourglassEmpty />
-                    )
-                  }
-                  label={order.status}
-                  color={order.status === 'Delivered' ? 'success' : 'warning'}
-                  variant="outlined"
-                  sx={{ mt: 1 }}
-                />
+              
               </CardContent>
             </Card>
           </Grid>

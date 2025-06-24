@@ -7,7 +7,7 @@ const Layout = () => {
   const hideNavbarPaths = ['/home','/','/not-allowed'];
 
   const shouldHideNavbar = hideNavbarPaths.includes(location.pathname);
-
+  
   return (
     <>
       {!shouldHideNavbar && <Navbar />}

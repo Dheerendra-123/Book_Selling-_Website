@@ -1,4 +1,4 @@
-import { Box, Chip, ListItemText, MenuItem, MenuList, Stack, Typography } from '@mui/material';
+import { Box, Chip, ListItemText, MenuItem, MenuList, Stack, Typography, useMediaQuery, useTheme } from '@mui/material';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -6,6 +6,8 @@ import { Link } from 'react-router-dom';
 const pendingConfirmations = 4;
 
 const Sidebar = () => {
+    const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm','md'));
   const Links = [
     {
       name: "WishList",
@@ -32,7 +34,8 @@ const Sidebar = () => {
   ];
 
   return (
-    <Box sx={{ width: 240, px: 2 }}>
+    !isMobile?(
+      <Box sx={{ width: 240, px: 2 }}>
       <Typography variant="h6" fontWeight="bold" mt={2} mb={1} color="primary">
         Dashboard Menu
       </Typography>
@@ -70,6 +73,8 @@ const Sidebar = () => {
         ))}
       </Stack>
     </Box>
+    ):false
+    
   );
 };
 

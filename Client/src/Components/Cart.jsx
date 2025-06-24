@@ -93,9 +93,11 @@ const CartPage = () => {
     }
   };
 
-  const handleCheckout = () => {
-    navigate('/checkout');
-  };
+ const handleCheckout = () => {
+  const itemIds = cartItems.map(item => item._id);
+  console.log("Proceeding to checkout with item IDs:", itemIds);
+  navigate('/checkout');
+};
 
   if (loading) {
     return (
@@ -143,7 +145,7 @@ const CartPage = () => {
   }
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
       <Box sx={{ mb: 4 }}>
         <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
           <IconButton onClick={() => navigate(-1)} size="large">
@@ -170,7 +172,7 @@ const CartPage = () => {
     
 
       <Grid container spacing={4}>
-        <Grid size={{xs:12, md:8}} >
+        <Grid size={{xs:12, md:6}} >
           <Stack spacing={3}>
           
             {cartItems.map((item, index) => (
@@ -212,7 +214,7 @@ const CartPage = () => {
             
           </Stack>
         </Grid>
-        <Grid size={{xs:12, md:4}} >
+        <Grid size={{xs:12, md:6}} >
           <Stack spacing={3} direction='row'>
             <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
@@ -246,8 +248,13 @@ const CartPage = () => {
                     ₹{total.toLocaleString()}
                   </Typography>
                 </Box>
+                   <Box>
+                  <Typography variant='body2' color='text.secondary' textAlign='center'>
+                  Add ₹{(500 - subtotal).toLocaleString()} more to get FREE shipping!
+                  </Typography>
+                </Box>
               </Stack>
-              <Button variant="contained" size="medium" fullWidth startIcon={<ShoppingCartCheckout />} onClick={handleCheckout} sx={{ mt: 3, py: 1.5, borderRadius: 3, textTransform: 'none', fontWeight: 600, fontSize: '1rem', background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)', boxShadow: '0 3px 5px 2px rgba(33, 203, 243, .3)' }}>
+              <Button onClick={()=>handleCheckout()} variant="contained" size="medium" fullWidth startIcon={<ShoppingCartCheckout />} sx={{ mt: 3, py: 1.5, borderRadius: 3, textTransform: 'none', fontWeight: 600, fontSize: '1rem', background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)', boxShadow: '0 3px 5px 2px rgba(33, 203, 243, .3)' }}>
                 Proceed to Checkout
               </Button>
               <Stack direction="row" spacing={2} sx={{ mt: 3, justifyContent: 'center' }}>
@@ -263,16 +270,11 @@ const CartPage = () => {
                   <CreditCard sx={{ fontSize: 16, mr: 0.5 }} />
                   <Typography variant="caption">Easy Payment</Typography>
                 </Box>
+               
               </Stack>
+            
             </Paper>
-            {subtotal < 500 && (
-              <Box>
-              <Alert severity="info" sx={{ borderRadius: 2 }}>
-                <AlertTitle>Almost there!</AlertTitle>
-                Add ₹{(500 - subtotal).toLocaleString()} more to get FREE shipping!
-              </Alert>
-              </Box>
-            )}
+     
           </Stack>
         </Grid>
       </Grid>

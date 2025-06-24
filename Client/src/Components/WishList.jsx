@@ -50,102 +50,113 @@ const WishList = () => {
     }
 
     return (
-        <Box >
-            <Box >
-                <Typography variant='h4' fontWeight={700} color='text.secondary' textAlign='center' gutterBottom>
-                    WishList
+  <Box>
+  <Box>
+    <Typography
+      variant="h4"
+      fontWeight={700}
+      color="text.secondary"
+      textAlign="center"
+      gutterBottom
+    >
+      WishList
+    </Typography>
+  </Box>
+
+  <Grid container spacing={2}  mt={3}>
+    {wishList.map((book, index) => (
+      <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+        {/* Wrapper Box for relative positioning */}
+        <Box position="relative">
+          {/* Delete Icon Positioned Top-Right */}
+          <IconButton
+            onClick={() => handleDelete(book._id)}
+            sx={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              zIndex: 1,
+              backgroundColor: 'white',
+              boxShadow: 1,
+              '&:hover': {
+                backgroundColor: 'grey.100',
+              },
+            }}
+          >
+            <Delete color="error" />
+          </IconButton>
+
+          <Card>
+            <CardMedia
+              component="img"
+              height="140"
+              image={
+                book.images && book.images.length > 0
+                  ? book.images[0]
+                  : '/placeholder-book.jpg'
+              }
+              alt={book.title}
+            />
+
+            <CardContent>
+              <Typography variant="h6">
+                {book.title.length > 18
+                  ? `${book.title.slice(0, 18)}...`
+                  : book.title}
+              </Typography>
+
+              <Typography variant="body2" color="text.secondary">
+                Author: {book.author}
+              </Typography>
+
+              <Typography variant="body2" color="text.secondary">
+                Edition: {book.edition}
+              </Typography>
+
+              <Stack direction="row" gap={1} mt={1} alignItems="center" flexWrap="wrap">
+                <Typography
+                  variant="body1"
+                  sx={{
+                    textDecoration: 'line-through',
+                    color: 'gray',
+                    fontWeight: 500,
+                  }}
+                >
+                  ₹{book.originalPrice}
                 </Typography>
-            </Box>
-            <Grid container spacing={2} >
-            {
-                wishList.map((book, index) => 
-                     (
-                         <Grid size={{ xs: 12, sm: 4, md: 2.5 }} key={index}>
-                         <IconButton      sx={{
-                                boxShadow: 'none',
-                                '&:hover': {
-                                    boxShadow: 'none',
-                                    backgroundColor: 'transparent',
-                                },
-                                '&:active': {
-                                    boxShadow: 'none',
-                                    backgroundColor: 'transparent',
-                                },
-                               position:'relative',
-                               top:'35px'
-                            }}
-                            onClick={handleDelete}
-                            >
-                                <Delete color='primary' ></Delete>
-                            </IconButton>                        
-       
-                       
-                            <Card>
-                                <CardMedia
-                                    component="img"
-                                    height="140"
-                                    image={book.images && book.images.length > 0 ? book.images[0] : ''}
-                                    alt={book.title}
-                                />
-                                <CardContent>
-                                    <Typography variant="h6">
-                                        {book.title.length > 14 ? `${book.title.slice(0, 18)}...` : book.title}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Author: {book.author}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Edition: {book.edition}
-                                    </Typography>
-                                    <Stack direction='row' gap={1} mt={1}>
-                                        <Typography
-                                            variant="body1"
-                                            sx={{
-                                                textDecoration: 'line-through',
-                                                color: 'gray',
-                                                fontWeight: 500,
-                                            }}
-                                        >
-                                            ₹{book.originalPrice}
-                                        </Typography>
 
-                                        {/* New Price */}
-                                        <Typography
-                                            variant="body2"
-                                            sx={{
-                                                color: 'black',
-                                                fontWeight: 'bold',
-                                                fontSize: '1.2rem',
-                                            }}
-                                        >
-                                            ₹{book.price}
-                                        </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: 'black',
+                    fontWeight: 'bold',
+                    fontSize: '1.2rem',
+                  }}
+                >
+                  ₹{book.price}
+                </Typography>
 
-                                        {/* Discount Chip */}
-                                        <Chip
-                                            icon={<DiscountIcon/>}
-                                            size='small'
-                                            label={`${Math.round((1 - book.price / book.originalPrice) * 100)}% OFF`}
-                                            color="success"
-                                            variant='outlined'
-                                            sx={{
-                                                fontWeight: 'bold',
-                                            }}
-                                        />
-                                    </Stack>
-                                </CardContent>
-
-                            </Card>
-                        </Grid>
-                       
-                    )
-                )
-
-            }
-             </Grid>
-
-            
+                <Chip
+                  icon={<DiscountIcon />}
+                  size="small"
+                  label={`${Math.round(
+                    (1 - book.price / book.originalPrice) * 100
+                  )}% OFF`}
+                  color="success"
+                  variant="outlined"
+                  sx={{
+                    fontWeight: 'bold',
+                  }}
+                />
+              </Stack>
+            </CardContent>
+          </Card>
         </Box>
+      </Grid>
+    ))}
+  </Grid>
+</Box>
+
 
     );
 }

@@ -58,7 +58,7 @@ const BooksListed = () => {
 
       <Grid container spacing={3} mt={3}>
         {booksListed.map((book, index) => (
-          <Grid item xs={12} sm={6} md={4} key={book._id}>
+          <Grid size={{xs:12, sm:4 ,md:2.7 }}    key={book._id}>
             <Card sx={{ height: '100%' }}>
               <CardMedia
                 component="img"
@@ -73,15 +73,14 @@ const BooksListed = () => {
                 <Typography variant="body2" color="text.secondary">
                   Author: {book.author}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" gutterBottom>
                   Edition: {book.edition}
                 </Typography>
 
-                <Stack direction="row" alignItems="center" spacing={2} mt={2}>
                   <Typography variant="body1" fontWeight="bold">
                     ₹{book.price}
                   </Typography>              
-                </Stack>
+
               </CardContent>
             </Card>
           </Grid>

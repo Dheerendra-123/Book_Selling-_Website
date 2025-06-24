@@ -5,6 +5,8 @@ import {
   CardContent,
   Typography,
   Box,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import { Book, ShoppingCart, AttachMoney, Store } from '@mui/icons-material';
 
@@ -35,16 +37,20 @@ const stats = [
   },
 ];
 
+
+
 const Analytics = () => {
+      const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm','md'));
   return (
     <Box p={3}>
-      <Typography variant="h4" mb={4} fontWeight="bold">
+      <Typography variant={isMobile?"h5":"h4"} mb={4} fontWeight="bold" textAlign='center'>
         Dashboard Analytics
       </Typography>
       <Grid container spacing={3}>
         {stats.map((stat, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index}>
-            <Card sx={{ backgroundColor: stat.color, borderRadius: 3 }}>
+          <Grid size={{xs:12,sm:12,md:3}} key={index} >
+            <Card sx={{ backgroundColor: stat.color, borderRadius: 3,}}>
               <CardContent>
                 <Box display="flex" alignItems="center" gap={2}>
                   {stat.icon}

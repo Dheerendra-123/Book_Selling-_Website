@@ -79,10 +79,10 @@ const ConfirmOrder = () => {
                         (acc, item) => acc + item.price * item.quantity,
                         0
                     );
-                    const total = subtotal + order.tax + order.shipping;
+          
 
                     return (
-                        <Grid item xs={12} sm={12} md={6} key={order.id}>
+                        <Grid size={{xs:12,sm:4,md:4}} key={order.id}>
                             <Paper elevation={4} sx={{ p: 3, borderRadius: 3 }}>
                                 <Typography variant="h6" fontWeight={600} gutterBottom>
                                     Order ID: {order.id}

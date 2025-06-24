@@ -15,14 +15,12 @@ import { useEffect, useState } from 'react'
 import { api } from '../api/api'
 const Books = () => {
 
-  const category = ['Novel', 'Fantasy', 'Mathematics', 'Science', 'Cosmos', 'Encylopedia', 'HighSchool', 'Intermediate']
+
 
 
   const navigate = useNavigate();
 
-  const handleClick = (type) => {
-    console.log(`clicked on chip ${type}`);
-  }
+
 
   const previewHandle = (bookID) => {
     navigate(`/book/${bookID}`);
@@ -32,9 +30,10 @@ const Books = () => {
     navigate(`/view-details/${bookID}`);
   }
 
-
+  const category = ["All", "Science", "Fanatsy", "Adventure", "Novel", "Competition", "Story"];
 
   const [bookData, setBookData] = useState([]);
+
   const getAllBooks = async () => {
     try {
       const response = await api.get('/api/books', {
@@ -43,10 +42,15 @@ const Books = () => {
         }
       });
       setBookData(response.data.getAllBooks);
+
     } catch (error) {
       console.error("Failed to fetch books:", error);
     }
+
   };
+
+
+
 
   useEffect(() => {
     getAllBooks();
@@ -54,6 +58,10 @@ const Books = () => {
   useEffect(() => {
     console.log(bookData);
   }, [bookData]);
+
+  const handleCategory = (type) => {
+      console.log(type);
+  }
 
   return (
     <>
@@ -67,17 +75,23 @@ const Books = () => {
       </Box>
       <Container maxWidth={false} sx={{ maxWidth: '96%', mb: '20px' }}>
         <Box >
+
+
           <Stack direction='row' gap={1} mt={3}>
             {
               category.map((type, index) => (
-                <Chip key={index} label={type} variant='outlined' color="primary" onClick={() => handleClick(type)} />
+                <Chip key={index} label={type} variant='outlined' color="primary" onClick={() => handleCategory(type)} />
               ))
             }
           </Stack>
+
         </Box>
 
 
-        <Box >
+        <Box mt={2}>
+          <Typography variant='h5' color='text.secondary' fontWeight={700}>
+            Latest Books
+          </Typography>
           <Grid container spacing={2} pt={3}>
             {bookData.map((book, index) => (
               <Grid size={{ xs: 12, sm: 6, md: 2 }} key={index}>
@@ -126,7 +140,7 @@ const Books = () => {
                       <Chip
                         icon={<DiscountIcon />}
                         size='small'
-                        label=  {`${Math.round((1 - book.price / book.originalPrice) * 100)}% OFF`}
+                        label={`${Math.round((1 - book.price / book.originalPrice) * 100)}% OFF`}
                         color="success"
                         variant='outlined'
                         sx={{
