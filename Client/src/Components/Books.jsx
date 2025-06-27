@@ -60,7 +60,7 @@ const Books = () => {
   }, [bookData]);
 
   const handleCategory = (type) => {
-      console.log(type);
+    console.log(type);
   }
 
   return (
@@ -96,12 +96,17 @@ const Books = () => {
             {bookData.map((book, index) => (
               <Grid size={{ xs: 12, sm: 6, md: 2 }} key={index}>
                 <Card>
+                  <Box sx={{position:'relative',top:'40px',left:'7px'}}>
+                    <Chip label='Available' variant='outlined' size='medium' color='success' sx={{background:'white'}}></Chip>
+                  </Box>
                   <CardMedia
                     component="img"
                     height="140"
                     image={book.images && book.images.length > 0 ? book.images[0] : ''}
                     alt={book.title}
+
                   />
+
                   <CardContent>
                     <Typography variant="h6">
                       {book.title.length > 14 ? `${book.title.slice(0, 18)}...` : book.title}
@@ -149,12 +154,16 @@ const Books = () => {
                       />
                     </Stack>
                   </CardContent>
+
                   <CardActions>
                     <Button size="small" variant='outlined' onClick={() => previewHandle(book._id)}>Preview</Button>
                     <Button size="small" variant='outlined' onClick={() => detailsHandle(book._id)}>View Details</Button>
                   </CardActions>
+
                 </Card>
+
               </Grid>
+
             ))}
           </Grid>
         </Box>

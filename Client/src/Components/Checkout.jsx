@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+ 
+
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
   Box,
   Card,
@@ -11,9 +13,6 @@ import {
   StepLabel,
   Grid,
   FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Radio,
   RadioGroup,
   FormControlLabel,
@@ -27,8 +26,13 @@ import {
   Alert,
   Container
 } from '@mui/material';
+import { setCartItems } from '../../redux/cartSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { api } from '../api/api';
+import { handleError, handleSuccess } from '../Utils/Tostify';
 
 const Checkout = () => {
+
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -38,68 +42,126 @@ const Checkout = () => {
     city: '',
     state: '',
     pincode: '',
-    paymentMethod: 'card',
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
-    cardholderName: '',
-    upiId: ''
+    paymentMethod: 'card',  
+    cardNumber: '',        
+    expiryDate: '',         
+    cvv: '',                
+    cardholderName: '',     
+    upiId: ''               
   });
 
   const steps = ['Address Details', 'Order Summary', 'Payment'];
+  const orderListItems = useSelector((state) => state.cart.items);
+  const dispatch = useDispatch();
+  
+  // FIX 1: Prevent multiple cart fetches
+  const hasFetchedCart = useRef(false);
 
-  // Sample order items
-  const orderItems = [
-    { id: 1, name: 'Wireless Headphones', price: 2999, quantity: 1, image: '🎧' },
-    { id: 2, name: 'Smartphone Case', price: 599, quantity: 2, image: '📱' },
-    { id: 3, name: 'USB Cable', price: 299, quantity: 1, image: '🔌' }
-  ];
+  useEffect(() => {
+    // Only fetch cart once
+    if (hasFetchedCart.current) return;
+    
+    const fetchCart = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await api.get('/api/cart', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const orderItems = res.data.items.map((i) => i.productId);
+        dispatch(setCartItems(orderItems));
+        hasFetchedCart.current = true
+      } catch (err) {
+        console.error('Failed to load cart:', err);
+        hasFetchedCart.current = true; 
+      }
+    };
 
-  const subtotal = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    fetchCart();
+  }, []); // Remove dispatch dependency
+
+  // FIX 2: Memoize calculated values to prevent re-renders
+  const subtotal = React.useMemo(() => {
+    return orderListItems.reduce((sum, item) => sum + (item.price || 0), 0);
+  }, [orderListItems]);
+
   const shipping = 50;
-  const total = subtotal + shipping;
+  const total = React.useMemo(() => subtotal + shipping, [subtotal]);
 
-  const handleInputChange = (event) => {
-    setFormData({
-      ...formData,
-      [event.target.name]: event.target.value
+  // FIX 3: Stable event handlers
+  const handleInputChange = useCallback((event) => {
+    const { name, value } = event.target;
+    
+    setFormData(prevData => {
+      const newData = { ...prevData, [name]: value };
+      return newData;
     });
-  };
+  }, []);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
+  }, []);
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
+  }, []);
 
-  const handlePlaceOrder = () => {
-    if (formData.paymentMethod === 'cod') {
-      alert('Order placed successfully! You will pay ₹' + total + ' on delivery.');
-    } else {
-      setActiveStep(2); // Go to payment step
+
+  const handlePayment = useCallback(async () => {
+    const token = localStorage.getItem('token');
+
+    const orderPayload = {
+      items: orderListItems.map(item => ({
+        product: item._id,
+        quantity: 1
+      })),
+      shippingAddress: {
+        fullName: formData.fullName,
+        mobile: formData.mobile,
+        email: formData.email,
+        address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        pincode: formData.pincode
+      },
+      paymentMethod: formData.paymentMethod,
+      isPaid: formData.paymentMethod !== 'cod',
+      totalAmount: total
+    };
+
+    try {
+      await api.post('/api/orders', orderPayload, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      handleSuccess('Order placed successfully! Thank you for your purchase.');
+    } catch (error) {
+      console.error('Payment failed:', error);
+      handleError('Something went wrong while placing your order.');
     }
-  };
+  }, [orderListItems, formData, total]);
 
-  const handlePayment = () => {
-    let message = 'Order placed successfully! ';
-    if (formData.paymentMethod === 'card') {
-      message += 'Payment processed via demo card gateway.';
-    } else if (formData.paymentMethod === 'upi') {
-      message += 'Payment processed via UPI ID: ' + formData.upiId;
-    }
-    alert(message + ' This is a demo checkout.');
-  };
 
-  // Step 1: Address Details
-  const AddressStep = () => (
+  const handlePlaceOrder = useCallback(() => {
+  if (formData.paymentMethod === 'cod') {
+    // Directly process payment with COD
+    handlePayment(false);
+  } else {
+    // Go to payment step for online methods
+    setActiveStep(2);
+  }
+}, [formData.paymentMethod, handlePayment]);
+
+
+  // FIX 4: Move step components outside and make them stable
+  const renderAddressStep = useCallback(() => (
     <Box>
       <Typography variant="h5" gutterBottom>
         Shipping Address
       </Typography>
       <Grid container spacing={3}>
-        <Grid size={{xs:12,sm:6,md:6}}>
+        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
           <TextField
             required
             fullWidth
@@ -110,7 +172,7 @@ const Checkout = () => {
             variant="outlined"
           />
         </Grid>
-        <Grid  size={{xs:12,sm:6,md:6}}>
+        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
           <TextField
             required
             fullWidth
@@ -122,7 +184,7 @@ const Checkout = () => {
             placeholder="+91 XXXXX XXXXX"
           />
         </Grid>
-        <Grid  size={{xs:12,sm:6,md:6}}>
+        <Grid size={{ xs: 12, sm: 6, md: 6 }}>
           <TextField
             fullWidth
             name="email"
@@ -133,7 +195,7 @@ const Checkout = () => {
             variant="outlined"
           />
         </Grid>
-        <Grid item size={{xs:12,sm:12,md:12}}>
+        <Grid size={{ xs: 12, sm: 12, md: 12 }}>
           <TextField
             required
             fullWidth
@@ -147,7 +209,7 @@ const Checkout = () => {
             placeholder="House No, Street, Area"
           />
         </Grid>
-        <Grid  size={{xs:12,sm:4,md:4}}>
+        <Grid size={{ xs: 12, sm: 4, md: 4 }}>
           <TextField
             required
             fullWidth
@@ -158,19 +220,18 @@ const Checkout = () => {
             variant="outlined"
           />
         </Grid>
-        <Grid  size={{xs:12,sm:4,md:4}}>
-          <FormControl fullWidth required>
-            <TextField
-              name="state"
-              value={formData.state}
-              onChange={handleInputChange}
-              label="State"
-            >
-
-            </TextField>
-          </FormControl>
+        <Grid size={{ xs: 12, sm: 4, md: 4 }}>
+          <TextField
+            required
+            fullWidth
+            name="state"
+            label="State"
+            value={formData.state}
+            onChange={handleInputChange}
+            variant="outlined"
+          />
         </Grid>
-        <Grid size={{xs:12,sm:4,md:4}}>
+        <Grid size={{ xs: 12, sm: 4, md: 4 }}>
           <TextField
             required
             fullWidth
@@ -184,16 +245,14 @@ const Checkout = () => {
         </Grid>
       </Grid>
     </Box>
-  );
+  ), [formData, handleInputChange]);
 
-  // Step 2: Order Summary
-  const OrderSummaryStep = () => (
+  const renderOrderSummaryStep = useCallback(() => (
     <Box>
       <Typography variant="h5" gutterBottom>
         Order Summary
       </Typography>
-      
-      {/* Shipping Address Summary */}
+
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Typography variant="h6" gutterBottom>
@@ -208,37 +267,36 @@ const Checkout = () => {
         </CardContent>
       </Card>
 
-      {/* Order Items */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Typography variant="h6" gutterBottom>
             Items Ordered
           </Typography>
-          <List>
-            {orderItems.map((item, index) => (
-              <React.Fragment key={item.id}>
-                <ListItem>
-                  <ListItemAvatar>
-                    <Avatar sx={{ bgcolor: 'primary.light' }}>
-                      {item.image}
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={item.name}
-                    secondary={`Qty: ${item.quantity} × ₹${item.price}`}
+
+          {orderListItems.map((item, index) => (
+            <List key={item._id || index}>
+              <ListItem>
+                <ListItemAvatar>
+                  <Avatar
+                    alt={item.title}
+                    src={item.images?.[0]} 
+                    variant="rounded" 
                   />
-                  <Typography variant="h6">
-                    ₹{item.price * item.quantity}
-                  </Typography>
-                </ListItem>
-                {index < orderItems.length - 1 && <Divider />}
-              </React.Fragment>
-            ))}
-          </List>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={item.title}
+                  secondary={`Qty: 1 × ₹${item.price}`}
+                />
+                <Typography variant="h6">
+                  ₹{item.price}
+                </Typography>
+              </ListItem>
+              {index < orderListItems.length - 1 && <Divider />}
+            </List>
+          ))}
         </CardContent>
       </Card>
 
-      {/* Price Breakdown */}
       <Card>
         <CardContent>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
@@ -249,7 +307,7 @@ const Checkout = () => {
             <Typography>Shipping</Typography>
             <Typography>₹{shipping}</Typography>
           </Box>
-  
+
           <Divider sx={{ mb: 2 }} />
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Typography variant="h6">Total</Typography>
@@ -258,7 +316,6 @@ const Checkout = () => {
         </CardContent>
       </Card>
 
-      {/* Payment Method Selection */}
       <Card sx={{ mt: 3 }}>
         <CardContent>
           <FormControl component="fieldset">
@@ -288,15 +345,14 @@ const Checkout = () => {
         </CardContent>
       </Card>
     </Box>
-  );
+  ), [formData, handleInputChange, orderListItems, subtotal, total]);
 
-  // Step 3: Payment
-  const PaymentStep = () => (
+  const renderPaymentStep = useCallback(() => (
     <Box>
       <Typography variant="h5" gutterBottom>
         Payment Details
       </Typography>
-      
+
       <Alert severity="info" sx={{ mb: 3 }}>
         This is a demo payment gateway. No real transactions will be processed.
       </Alert>
@@ -308,7 +364,7 @@ const Checkout = () => {
               Card Payment
             </Typography>
             <Grid container spacing={3}>
-              <Grid size={{xs:12,sm:6,md:6}}>
+              <Grid size={{ xs: 12, sm: 6, md: 6 }}>
                 <TextField
                   required
                   fullWidth
@@ -319,7 +375,7 @@ const Checkout = () => {
                   variant="outlined"
                 />
               </Grid>
-              <Grid size={{xs:12,sm:6,md:6}}>
+              <Grid size={{ xs: 12, sm: 6, md: 6 }}>
                 <TextField
                   required
                   fullWidth
@@ -332,7 +388,7 @@ const Checkout = () => {
                   inputProps={{ maxLength: 19 }}
                 />
               </Grid>
-              <Grid size={{xs:12,sm:6,md:6}}>
+              <Grid size={{ xs: 12, sm: 6, md: 6 }}>
                 <TextField
                   required
                   fullWidth
@@ -345,7 +401,7 @@ const Checkout = () => {
                   inputProps={{ maxLength: 5 }}
                 />
               </Grid>
-              <Grid size={{xs:12,sm:6,md:6}}>
+              <Grid size={{ xs: 12, sm: 6, md: 6 }}>
                 <TextField
                   required
                   fullWidth
@@ -384,7 +440,6 @@ const Checkout = () => {
         </Card>
       )}
 
-      {/* Amount Summary */}
       <Card sx={{ mt: 3 }}>
         <CardContent>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -396,20 +451,20 @@ const Checkout = () => {
         </CardContent>
       </Card>
     </Box>
-  );
+  ), [formData, handleInputChange, total]);
 
-  const getStepContent = (step) => {
+  const getStepContent = useCallback((step) => {
     switch (step) {
       case 0:
-        return <AddressStep />;
+        return renderAddressStep();
       case 1:
-        return <OrderSummaryStep />;
+        return renderOrderSummaryStep();
       case 2:
-        return <PaymentStep />;
+        return renderPaymentStep();
       default:
         return 'Unknown step';
     }
-  };
+  }, [renderAddressStep, renderOrderSummaryStep, renderPaymentStep]);
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
@@ -434,7 +489,7 @@ const Checkout = () => {
           >
             Back
           </Button>
-          
+
           {activeStep === 1 ? (
             <Button
               variant="contained"
@@ -446,7 +501,7 @@ const Checkout = () => {
           ) : activeStep === steps.length - 1 ? (
             <Button
               variant="contained"
-              onClick={handlePayment}
+              onClick={()=>handlePayment(true)}
               size="large"
               color="success"
             >

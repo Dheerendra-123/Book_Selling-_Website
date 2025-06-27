@@ -1,4 +1,4 @@
-import {cartModel} from '../Model/cartModel.js';
+import { cartModel } from "../Model/cartModel.js";
 
 export const addToCart = async (req, res) => {
   const bookData = req.body; // full bookData object
@@ -17,11 +17,11 @@ export const addToCart = async (req, res) => {
     } else {
       // Check if item already in cart
       const alreadyExists = cart.items.find(
-        item => item.productId.toString() === productId
+        (item) => item.productId.toString() === productId
       );
 
       if (alreadyExists) {
-        return res.json({ message: 'Item already in cart' });
+        return res.json({ message: "Item already in cart" });
       }
 
       // Add to existing cart
@@ -31,50 +31,64 @@ export const addToCart = async (req, res) => {
     await cart.save();
 
     // Return updated cart with populated book details
-    const updatedCart = await cartModel.findOne({ userId }).populate('items.productId');
+    const updatedCart = await cartModel
+      .findOne({ userId })
+      .populate("items.productId");
     res.json(updatedCart);
-    console.log("Cart Item Added:",updatedCart);
+    console.log("Cart Item Added:", updatedCart);
   } catch (error) {
-    res.json({ message: 'Error adding to cart', error });
+    res.json({ message: "Error adding to cart", error });
   }
 };
 
 export const getCart = async (req, res) => {
   try {
-    const cart = await cartModel.findOne({ userId: req.user.id }).populate('items.productId');
+    const cart = await cartModel
+      .findOne({ userId: req.user.id })
+      .populate("items.productId");
     if (!cart) return res.json({ items: [] });
 
     res.json(cart);
     // console.log("Cart Item Fetced->",cart);
   } catch (error) {
-    res.json({ message: 'Error fetching cart', error });
+    res.json({ message: "Error fetching cart", error });
   }
-}
+};
+
+import mongoose from 'mongoose';
 
 export const removeFromCart = async (req, res) => {
   try {
-    const { itemId } = req.params;
-    const userId = req.user.id; // or get from token/session if implemented
+    const { productId } = req.body; // 👈 now expecting BookForm ID
+    const userId = req.user.id;
 
     const updatedCart = await cartModel.findOneAndUpdate(
       { userId },
-      { $pull: { items: { _id: itemId } } },
+      {
+        $pull: {
+          items: { productId: new mongoose.Types.ObjectId(productId) } // ✅ pull by productId
+        }
+      },
       { new: true }
-    );
+    ).populate("items.productId"); // ✅ repopulate cart with book details
 
     if (!updatedCart) {
-      return res.json({ message: "Cart not found", success: false });
+      return res.json({ success: false, message: "Cart not found" });
     }
 
-    res.json({ message: "Item removed from cart successfully", success: true, cart: updatedCart });
-    console.log("Item removed from cart successfully",updatedCart);
+    console.log(`Product ${productId} removed from cart of user ${userId}`);
+
+    res.json({
+      success: true,
+      message: "Item removed from cart successfully",
+      cart: updatedCart,
+    });
+
   } catch (error) {
     console.error("Error removing cart item:", error);
-    res.json({ message: "Internal server error", success: false });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
 
-export const clearCart=async(req,res)=>{
-
-}
+export const clearCart = async (req, res) => {};

@@ -85,6 +85,6 @@ const bookSchema = new mongoose.Schema({
     required: true,
   },
   created: {type: Date, default: Date.now}
-});
+}, { timestamps: true });
 
 export const formModel = mongoose.model("BookForm", bookSchema);

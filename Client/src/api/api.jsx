@@ -11,9 +11,10 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      console.warn("Token expired or unauthorized. Redirecting to login.");
-      handleError("Token expired or unauthorized. Redirecting to login.")
+        handleError("Token expired or unauthorized. Redirecting to login.")
 
+      console.warn("Token expired or unauthorized. Redirecting to login.");
+      
       // Clear storage
       localStorage.removeItem("token");
 

@@ -27,10 +27,6 @@ const Sidebar = () => {
       name: 'BooksListed',
       link: 'booksListed',
     },
-    {
-      name: 'Books Buyed',
-      link: 'booksBuyed',
-    },
   ];
 
   return (

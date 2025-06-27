@@ -33,6 +33,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { handleError, handleSuccess } from '../Utils/Tostify';
 import { setCartItems } from '../../redux/cartSlice';
 import DiscountIcon from '@mui/icons-material/Discount';
+import { addToWishList } from '../../redux/wishListSlice';
 
 const BookDetails = () => {
   const { id } = useParams();
@@ -40,7 +41,6 @@ const BookDetails = () => {
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items);
-
 
 const handleAddToCart = async () => {
   try {
@@ -65,23 +65,26 @@ const handleAddToCart = async () => {
     }
   } catch (error) {
     console.error('Error adding to cart:', error);
-    handleError('Failed to add item to cart');
+    handleError('Item is already in cart');
   }
 };
 
 
-const handleAddToWishList=async()=>{
-    try{
-      const token = localStorage.getItem('token');
-      const res=await api.post('/api/wishlist/add',{ bookId: bookData._id },{
-          headers:{Authorization:`Bearer ${token}`}
-      })
-      console.log(res.data);
-      handleSuccess(res.data.message)
-    }catch(error){
-      console.log(error);
+const handleAddToWishList = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const res = await api.post('/api/wishlist/add', { bookId: bookData._id }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (res.data.success) {
+      handleSuccess(res.data.message);
+      dispatch(addToWishList(bookData)); // 👈 Add to Redux
     }
-}
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 
   const getBook = async () => {

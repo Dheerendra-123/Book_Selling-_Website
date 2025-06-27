@@ -37,5 +37,5 @@ export const removeWishlist = async (req, res) => {
   );
 
   console.log(`✅ Book with ID ${bookId} deleted from wishlist of user ${req.user.id}`);
-  res.json({ success: true, message: `Removed book ${bookId} from wishlist` });
+  res.json({ success: true, message: `Removed book from wishlist` });
 };

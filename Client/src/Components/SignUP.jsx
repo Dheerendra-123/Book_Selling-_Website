@@ -61,16 +61,14 @@ const SignUP = () => {
             const response = await api.post(`/api/user/signup`, formData);
 
             if (response.data.success) {
-                handleSuccess("User Registered Successfully");
-
-                localStorage.removeItem('selectedRole');
+                handleSuccess(response.data.message);
 
                 navigate('/login');
             } else {
-                handleError(response.data.message || "Signup failed");
+                handleError(response.data.errorMessage);
             }
         } catch (error) {
-            handleError("Something went wrong. Try again later.");
+            handleError(response.data.error);
             console.error(error);
         } finally {
             setIsLoding(false);

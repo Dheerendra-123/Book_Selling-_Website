@@ -21,7 +21,6 @@ import WishList from './Components/wishList';
 import Analytics from './Components/Analytics';
 import MyOrders from './Components/MyOrders';
 import BooksListed from './Components/BooksListed';
-import BooksPurchased from './Components/BooksPurchased';
 import ConfirmOrder from './Components/ConfirmOrder';
 import Checkout from './Components/Checkout';
 
@@ -136,14 +135,7 @@ const App = () => {
                 </ProtectedRoute>
               ),
             },
-            {
-              path: 'booksBuyed',
-              element: (
-                <ProtectedRoute>
-                  <BooksPurchased />
-                </ProtectedRoute>
-              ),
-            },
+
             {
               path: 'confirm',
               element: (
@@ -161,16 +153,16 @@ const App = () => {
     {
       path: '/signup',
       element:
-        <SignUP />,
+        <SignUP />
+
 
 
     },
     {
       path: '/login',
-      element: (<PublicOnlyRoute>
+      element: 
         <Login />
-      </PublicOnlyRoute>
-      )
+  
     },
   ]);
   return (

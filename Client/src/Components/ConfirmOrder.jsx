@@ -82,7 +82,7 @@ const ConfirmOrder = () => {
           
 
                     return (
-                        <Grid size={{xs:12,sm:4,md:4}} key={order.id}>
+                        <Grid size={{xs:12,sm:4,md:3}} key={order.id}>
                             <Paper elevation={4} sx={{ p: 3, borderRadius: 3 }}>
                                 <Typography variant="h6" fontWeight={600} gutterBottom>
                                     Order ID: {order.id}
@@ -121,7 +121,7 @@ const ConfirmOrder = () => {
                                 <Divider sx={{ my: 2 }} />
 
                                 <Button
-                                    variant="contained"
+                                    variant="outlined"
                                     color="primary"
                                     fullWidth
                                     sx={{ mt: 2, borderRadius: 2 }}

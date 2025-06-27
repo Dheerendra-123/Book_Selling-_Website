@@ -1,93 +1,116 @@
-import React from 'react';
-import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  CardMedia,
-  Typography,
-  Chip,
-  Stack,
-} from '@mui/material';
-import { CheckCircle, HourglassEmpty } from '@mui/icons-material';
-import img from '../assets/img.png'
-
+import Box from '@mui/material/Box'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import CardMedia from '@mui/material/CardMedia'
+import Chip from '@mui/material/Chip'
+import Grid from '@mui/material/Grid'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+import DiscountIcon from '@mui/icons-material/Discount';
+import { useEffect, useState } from 'react'
+import { api } from '../api/api'
 const BooksListed = () => {
 
-    const booksListed = [
-      {
-        _id: '1',
-        title: 'Harry Potter and the Goblet of Fire',
-        author: 'J.K. Rowling',
-        edition: '4th',
-        image: img,
-        price: 499,
-        quantity: 1,
-        status: 'Delivered',
-        purchaseDate: '2025-06-10T00:00:00Z',
-      },
-      {
-        _id: '2',
-        title: 'Clean Code',
-        author: 'Robert C. Martin',
-        edition: '1st',
-        image: img,
-        price: 699,
-        quantity: 1,
-        status: 'Pending',
-        purchaseDate: img,
-      },
-      {
-        _id: '3',
-        title: 'The Pragmatic Programmer',
-        author: 'Andrew Hunt',
-        edition: '2nd',
-        image: img,
-        price: 799,
-        quantity: 1,
-        status: 'Delivered',
-        purchaseDate: '2025-06-18T00:00:00Z',
-      },
-    ];
-    
+  const [bookData, setBookData] = useState([]);
+
+  const getAllBooks = async () => {
+    try {
+      const response = await api.get('/api/books', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      setBookData(response.data.getAllBooks);
+
+    } catch (error) {
+      console.error("Failed to fetch books:", error);
+    }
+
+  };
+
+
+
+
+  useEffect(() => {
+    getAllBooks();
+  }, [])
+  useEffect(() => {
+    console.log(bookData);
+  }, [bookData]);
+
   return (
-    <Box p={3}>
-      <Typography variant="h4" fontWeight={700} color="text.secondary" textAlign="center" gutterBottom>
-        Books Listed
-      </Typography>
+   
+        <Box mt={2}>
+          <Grid container spacing={2} pt={3}>
+            {bookData.map((book, index) => (
+              <Grid size={{ xs: 12, sm: 5, md: 2.5 }} key={index}>
+                <Card>
+                  <CardMedia
+                    component="img"
+                    height="140"
+                    image={book.images && book.images.length > 0 ? book.images[0] : ''}
+                    alt={book.title}
 
-      <Grid container spacing={3} mt={3}>
-        {booksListed.map((book, index) => (
-          <Grid size={{xs:12, sm:4 ,md:2.7 }}    key={book._id}>
-            <Card sx={{ height: '100%' }}>
-              <CardMedia
-                component="img"
-                height="160"
-                image={book.image}
-                alt={book.title}
-              />
-              <CardContent>
-                <Typography variant="h6" fontWeight={600}>
-                  {book.title.length > 18 ? `${book.title.slice(0, 18)}...` : book.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Author: {book.author}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Edition: {book.edition}
-                </Typography>
+                  />
 
-                  <Typography variant="body1" fontWeight="bold">
-                    ₹{book.price}
-                  </Typography>              
+                  <CardContent>
+                    <Typography variant="h6">
+                      {book.title.length > 14 ? `${book.title.slice(0, 18)}...` : book.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Author: {book.author}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Edition: {book.edition}
+                    </Typography>
+                    <Stack direction='row' gap={1} mt={1}>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          textDecoration: 'line-through',
+                          color: 'gray',
+                          fontWeight: 500,
+                        }}
+                      >
+                        ₹{book.originalPrice}
+                      </Typography>
 
-              </CardContent>
-            </Card>
+                      {/* New Price */}
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: 'black',
+                          fontWeight: 'bold',
+                          fontSize: '1.2rem',
+                        }}
+                      >
+                        ₹{book.price}
+                      </Typography>
+
+                      {/* Discount Chip */}
+                      <Chip
+                        icon={<DiscountIcon />}
+                        size='small'
+                        label={`${Math.round((1 - book.price / book.originalPrice) * 100)}% OFF`}
+                        color="success"
+                        variant='outlined'
+                        sx={{
+                          fontWeight: 'bold',
+                        }}
+                      />
+                    </Stack>
+                  </CardContent>
+
+                </Card>
+
+              </Grid>
+
+            ))}
           </Grid>
-        ))}
-      </Grid>
-    </Box>
-  );
+        </Box>
+
+
+  )
 }
 
-export default BooksListed
+export default BooksListed ;

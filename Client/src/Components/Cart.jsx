@@ -34,7 +34,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setCartItems, removeFromCart, clearCart } from '../../redux/cartSlice';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/api';
-import { handleSuccess } from '../Utils/Tostify';
+import { handleError, handleSuccess } from '../Utils/Tostify';
 
 const CartPage = () => {
   const navigate = useNavigate();
@@ -69,14 +69,17 @@ const CartPage = () => {
 
   const handleRemoveItem = async (itemId) => {
     try {
+
       const token = localStorage.getItem('token');
       const res=await api.delete(`api/cart/${itemId}`, {
         headers: { Authorization: `Bearer ${token}` },
+        data: { productId:itemId }
       });
       dispatch(removeFromCart(itemId));
-      handleSuccess(res.data.success)
+      handleSuccess(res.data.message)
       console.log(res.data)
     } catch (err) {
+      handleError(res.data.errormessage);
       console.error('Failed to remove item from cart:', err);
     }
   };

@@ -6,8 +6,8 @@ export const signUpController = async (req, res) => {
   const { name, email, password} = req.body;
   if (!name || !email || !password) {
     return res.json({
-      message: "Please enter all fields",
-      sucess: false,
+      errorMessage: "Please enter all fields",
+      success: false,
       status: 400,
     });
   }
@@ -15,25 +15,25 @@ export const signUpController = async (req, res) => {
     let user = await userModel.findOne({ email });
     if (user) {
       return res.json({
-        message: "User Already exist with this email id",
-        sucess: false,
+        errorMessage: "User Already exist with this email id",
+        success: false,
       });
     }
     let hashPassword = await bcrypt.hash(password, 10);
     const newUser = await userModel.create({
       name,
       email,
-      password: hashPassword,
-      role
+      password: hashPassword
     });
     console.log("User Created Successfully", newUser);
     return res.json({
       message: "User Registerd Sucessfully",
-      sucess: true,
+      success: true,
       status: 200,
     });
   } catch (error) {
-    return res.json({ message: "Internal Server Erroe", sucess: false, status: 404 });
+    console.log(error);
+    return res.json({ error, success: false, status: 404 });
     
   }
 };
