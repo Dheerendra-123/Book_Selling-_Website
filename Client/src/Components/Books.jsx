@@ -242,20 +242,6 @@ const Books = () => {
         </Box>
 
         <Box mt={2}>
-          {filteredBooks.length === 0 ? (
-            <Box textAlign="center" py={4}>
-              <Typography variant="h6" color="text.secondary">
-                No books found matching your criteria
-              </Typography>
-              <Button
-                variant="outlined"
-                onClick={clearFilters}
-                sx={{ mt: 2 }}
-              >
-                Clear Filters
-              </Button>
-            </Box>
-          ) : (
             <Grid container spacing={2} pt={1} justifyContent={isMobile ? 'center' : false}>
               {filteredBooks.map((book, index) => (
                 <Grid size={{xs:12,sm:6,md:2.3}} key={index}>
@@ -312,7 +298,7 @@ const Books = () => {
                 </Grid>
               ))}
             </Grid>
-          )}
+          
         </Box>
       </Container>
     </>
