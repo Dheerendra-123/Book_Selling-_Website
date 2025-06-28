@@ -70,29 +70,10 @@
 
 
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
 import cloudinary from '../Config/cloudinaryConfig.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// ✅ Create uploads directory if it doesn't exist
-const uploadsDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-// Multer storage config
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadsDir);
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
+// Use memory storage instead of disk storage
+const storage = multer.memoryStorage();
 
 // File filter
 const fileFilter = (req, file, cb) => {
@@ -105,34 +86,49 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
   fileFilter: fileFilter
 });
 
-// Cloudinary upload
-const uploadToCloudinary = async (filePath) => {
+// Direct upload to Cloudinary from buffer
+const uploadToCloudinary = async (fileBuffer, originalname) => {
   try {
-    const result = await cloudinary.uploader.upload(filePath, {
-      folder: 'lostAndFound',
-      use_filename: true
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'lostAndFound',
+          use_filename: true,
+          unique_filename: true,
+          resource_type: 'auto'
+        },
+        (error, result) => {
+          if (error) {
+            reject(new Error(`Error uploading to Cloudinary: ${error.message}`));
+          } else {
+            resolve({
+              url: result.secure_url,
+              public_id: result.public_id
+            });
+          }
+        }
+      );
+      
+      uploadStream.end(fileBuffer);
     });
-    return {
-      url: result.secure_url,
-      public_id: result.public_id
-    };
   } catch (error) {
     throw new Error(`Error uploading to Cloudinary: ${error.message}`);
   }
 };
 
-// Cleanup local file
-const removeLocalFile = (filePath) => {
+// Function to delete from Cloudinary (useful for cleanup)
+const deleteFromCloudinary = async (publicId) => {
   try {
-    fs.unlinkSync(filePath);
-    console.log('Removed:', filePath);
+    const result = await cloudinary.uploader.destroy(publicId);
+    return result;
   } catch (error) {
-    console.error('Error removing local file:', filePath, error.message);
+    console.error('Error deleting from Cloudinary:', error.message);
+    throw error;
   }
 };
 
-export { upload, uploadToCloudinary, removeLocalFile };
+export { upload, uploadToCloudinary, deleteFromCloudinary };
