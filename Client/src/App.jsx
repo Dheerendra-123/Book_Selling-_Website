@@ -17,7 +17,7 @@ import Cart from './Components/Cart';
 import SellBookForm from './Components/SellBookForm';
 import PublicOnlyRoute from './Utils/PublicOnlyRoute';
 import Dashboard from './Components/Dashbord';
-import WishList from './Components/wishList';
+import WishList from './Components/WishList';
 import Profile from './Components/Profile';
 import MyOrders from './Components/MyOrders';
 import BooksListed from './Components/BooksListed';
