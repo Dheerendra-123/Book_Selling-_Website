@@ -59,7 +59,7 @@ const MyOrders = () => {
             order.items.map((item) => {
               const product = item.product || {};
               return (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={item._id}>
+                <Grid size={{ xs: 12, sm: 4, md: 3, lg: 3 }} key={item._id}>
                   <Card sx={{ height: '100%' }}>
                     <CardMedia
                       component="img"
@@ -72,9 +72,9 @@ const MyOrders = () => {
                       alt={product.title || 'Book'}
                     />
                     <CardContent>
-                      <Typography variant="h6" fontWeight={600}>
+                      <Typography variant="h6" >
                         {product.title?.length > 18
-                          ? `${product.title.slice(0, 18)}...`
+                          ? `${product.title.slice(0, 20)}...`
                           : product.title || 'Untitled'}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">

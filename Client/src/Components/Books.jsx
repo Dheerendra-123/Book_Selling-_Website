@@ -452,7 +452,7 @@ const Books = () => {
           ) : (
             <Grid container spacing={2} pt={1}>
               {filteredBooks.map((book, index) => (
-                <Grid size={{ xs: 12, sm: 6, md: 2 }} key={index}>
+                <Grid size={{ xs: 12, sm: 6, md: 2.5 }} key={index}>
                   <Box sx={{position:'relative',top:'40px',left:'7px'}}>
                     <Chip 
                       label={book.isOrdered?"Not Available":"Available"} 
@@ -472,7 +472,7 @@ const Books = () => {
 
                     <CardContent>
                       <Typography variant="h6">
-                        {book.title.length > 14 ? `${book.title.slice(0, 18)}...` : book.title}
+                        {book.title.length > 14 ? `${book.title.slice(0, 24)}...` : book.title}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
                         Author: {book.author}
@@ -517,8 +517,10 @@ const Books = () => {
                     </CardContent>
 
                     <CardActions>
-                      <Button size="small" variant='outlined' onClick={() => previewHandle(book._id)}>Preview</Button>
-                      <Button size="small" variant='outlined' onClick={() => detailsHandle(book._id)}>View Details</Button>
+                 
+                      <Button size="small" variant='outlined' onClick={() => previewHandle(book._id)} fullWidth>Preview</Button>
+                      <Button size="small" variant='outlined' onClick={() => detailsHandle(book._id)} fullWidth>View Details</Button>
+                   
                     </CardActions>
                   </Card>
                 </Grid>

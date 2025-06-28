@@ -42,49 +42,68 @@ const BookDetails = () => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items);
 
-const handleAddToCart = async () => {
-  try {
-    if (!bookData || !bookData._id) {
-      handleError('Book data not available');
-      return;
-    }
+  const handleAddToCart = async () => {
+    try {
+      if (!bookData || !bookData._id) {
+        handleError('Book data not available');
+        return;
+      }
 
-    const alreadyInCart = cartItems.find(item => item._id === bookData._id);
-    if (alreadyInCart) {
+      const alreadyInCart = cartItems.find(item => item._id === bookData._id);
+      if (alreadyInCart) {
+        handleError('Item is already in cart');
+      } else {
+        const token = localStorage.getItem('token');
+        const res = await api.post('/api/cart', bookData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // Convert backend response to expected Redux format
+        const updatedItems = res.data.items.map(i => i.productId); // populated BookForm
+        dispatch(setCartItems(updatedItems));
+        handleSuccess('Item added to cart');
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
       handleError('Item is already in cart');
+    }
+  };
+
+
+  const handleShare = () => {
+    const shareData = {
+      title: document.title,
+      text: 'Check this out!',
+      url: window.location.href,
+    };
+
+    if (navigator.share) {
+      navigator.share(shareData).catch((err) => console.error('Share failed:', err));
     } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(shareData.url).then(() => {
+        alert('Link copied to clipboard!');
+      });
+    }
+  };
+
+
+
+  const handleAddToWishList = async () => {
+    try {
       const token = localStorage.getItem('token');
-      const res = await api.post('/api/cart', bookData, {
-        headers: { Authorization: `Bearer ${token}` },
+      const res = await api.post('/api/wishlist/add', { bookId: bookData._id }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
 
-      // Convert backend response to expected Redux format
-      const updatedItems = res.data.items.map(i => i.productId); // populated BookForm
-      dispatch(setCartItems(updatedItems));
-      handleSuccess('Item added to cart');
+      if (res.data.success) {
+        handleSuccess(res.data.message);
+        dispatch(addToWishList(bookData)); // 👈 Add to Redux
+      }
+    } catch (error) {
+      console.log(error);
     }
-  } catch (error) {
-    console.error('Error adding to cart:', error);
-    handleError('Item is already in cart');
-  }
-};
-
-
-const handleAddToWishList = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    const res = await api.post('/api/wishlist/add', { bookId: bookData._id }, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    if (res.data.success) {
-      handleSuccess(res.data.message);
-      dispatch(addToWishList(bookData)); // 👈 Add to Redux
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
+  };
 
 
   const getBook = async () => {
@@ -182,13 +201,110 @@ const handleAddToWishList = async () => {
               {/* Action buttons */}
               <Stack direction="row" spacing={1}>
                 <Tooltip title="Add to Wishlist">
-                  <IconButton size="large" sx={{ bgcolor: 'grey.50' }} onClick={handleAddToWishList}>
-                    <Bookmark />
+                  <IconButton
+                    size="large"
+                    onClick={handleAddToWishList}
+                    sx={{
+                      bgcolor: 'white',
+                      border: '1px solid',
+                      borderColor: 'grey.300',
+                      borderRadius: 2,
+                      color: 'grey.700',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      '&:before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        width: 0,
+                        height: 0,
+                        bgcolor: 'primary.main',
+                        borderRadius: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        transition: 'all 0.5s ease-out',
+                        opacity: 0,
+                        zIndex: 0
+                      },
+                      '& .MuiSvgIcon-root': {
+                        position: 'relative',
+                        zIndex: 1,
+                        transition: 'all 0.3s ease'
+                      },
+                      '&:hover': {
+                        bgcolor: 'primary.50',
+                        borderColor: 'primary.300',
+                        color: 'primary.700',
+                        boxShadow: '0 4px 12px rgba(25,118,210,0.15)',
+                        transform: 'translateY(-2px) scale(1.02)'
+                      },
+                      '&:active': {
+                        transform: 'translateY(0) scale(0.98)',
+                        '&:before': {
+                          width: '120%',
+                          height: '120%',
+                          opacity: 0.1
+                        }
+                      }
+                    }}
+                  >
+                    <Bookmark color='primary'/>
                   </IconButton>
                 </Tooltip>
+
                 <Tooltip title="Share">
-                  <IconButton size="large" sx={{ bgcolor: 'grey.50' }}>
-                    <Share />
+                  <IconButton
+                    size="large"
+                    onClick={handleShare}
+                    sx={{
+                      bgcolor: 'white',
+                      border: '1px solid',
+                      borderColor: 'grey.300',
+                      borderRadius: 2,
+                      color: 'grey.700',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      '&:before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        width: 0,
+                        height: 0,
+                        bgcolor: 'primary.main',
+                        borderRadius: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        transition: 'all 0.5s ease-out',
+                        opacity: 0,
+                        zIndex: 0
+                      },
+                      '& .MuiSvgIcon-root': {
+                        position: 'relative',
+                        zIndex: 1,
+                        transition: 'all 0.3s ease'
+                      },
+                      '&:hover': {
+                        bgcolor: 'primary.50',
+                        borderColor: 'primary.300',
+                        color: 'primary.700',
+                        boxShadow: '0 4px 12px rgba(25,118,210,0.15)',
+                        transform: 'translateY(-2px) scale(1.02)'
+                      },
+                      '&:active': {
+                        transform: 'translateY(0) scale(0.98)',
+                        '&:before': {
+                          width: '120%',
+                          height: '120%',
+                          opacity: 0.1
+                        }
+                      }
+                    }}
+                  >
+                    <Share color='primary'/>
                   </IconButton>
                 </Tooltip>
               </Stack>
@@ -251,7 +367,7 @@ const handleAddToWishList = async () => {
                 </Box>
 
                 {discountPercentage > 0 && (
-                  <Chip icon={<DiscountIcon />} variant='outlined' size='small' color='success' label={`${discountPercentage}% off`} sx={{p:'3px'}}></Chip>
+                  <Chip icon={<DiscountIcon />} variant='outlined' size='small' color='success' label={`${discountPercentage}% off`} sx={{ p: '3px' }}></Chip>
                 )}
               </Stack>
             </Box>
@@ -261,19 +377,19 @@ const handleAddToWishList = async () => {
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Info sx={{
                   mr: 1,
-                  color: bookData.isSold ? 'error.main' : 'success.main',
+                  color: bookData.isOrdered ? 'error.main' : 'success.main',
                   fontSize: 20
                 }} />
                 <Chip
-                  label={bookData.isSold ? "SOLD OUT" : "AVAILABLE"}
-                  color={bookData.isSold ? "error" : "success"}
+                  label={bookData.isOrdered ? "SOLD OUT" : "AVAILABLE"}
+                  color={bookData.isOrdered ? "error" : "success"}
                   variant="outlined"
                   size="medium"
                   sx={{ fontWeight: 600 }}
                 />
               </Box>
 
-              {!bookData.isSold && (
+              {!bookData.isOrdered && (
                 <Button
                   variant="contained"
                   size="medium"
@@ -448,7 +564,7 @@ const handleAddToWishList = async () => {
 
               <Stack spacing={1}>
                 <Box>
-                  <Typography variant="h6" color="text.primary" >
+                  <Typography variant="h7" color="text.primary" fontWeight={600}>
                     PIN Code
                   </Typography>
                   <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
@@ -457,10 +573,10 @@ const handleAddToWishList = async () => {
                 </Box>
 
                 <Box>
-                  <Typography variant="h6" color="text.primary" >
+                  <Typography variant="h7" color="text.primary" fontWeight={600}>
                     City & State
                   </Typography>
-                  <Typography variant="body1" color="text.primary" sx={{ fontWeight: 600 }}>
+                  <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
                     {bookData.city}, {bookData.state}
                   </Typography>
                 </Box>

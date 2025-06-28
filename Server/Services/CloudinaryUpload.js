@@ -57,7 +57,7 @@ const uploadToCloudinary = async (filePath) => {
 
 const removeLocalFile = (filePath) => {
   try {
-    console.log('Trying to remove:', filePath);
+    // console.log('Trying to remove:', filePath);
     fs.unlinkSync(filePath);
     console.log('Removed:', filePath);
   } catch (error) {

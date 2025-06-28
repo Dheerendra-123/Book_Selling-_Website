@@ -246,7 +246,7 @@ const PreviewBook = () => {
                                             Category:
                                         </Typography>
                                         <Chip
-                                            label="Fantasy"
+                                            label={bookData.category}
                                             size="small"
                                             variant="outlined"
                                             color="primary"
@@ -261,7 +261,7 @@ const PreviewBook = () => {
                                             Condition:
                                         </Typography>
                                         <Chip
-                                            label="Like New"
+                                            label={bookData.condition}
                                             size='small'
                                             variant='outlined'
 

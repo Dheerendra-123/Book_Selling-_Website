@@ -20,6 +20,7 @@ import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import { styled } from '@mui/material/styles';
 import { api } from '../api/api';
 import imageCompression from 'browser-image-compression';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -280,8 +281,10 @@ const SellBookForm = () => {
         },
       });
 
-      console.log(response.data);
+      // console.log(response.data);
+      const navigate=useNavigate();
       setSubmitMessage('Book listed successfully!');
+      navigate('/books');
       
       // Reset form
       setFormData({

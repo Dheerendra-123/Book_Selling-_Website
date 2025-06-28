@@ -1,40 +1,41 @@
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
-import Chip from '@mui/material/Chip'
 import { Container } from '@mui/system'
 import { useNavigate } from 'react-router-dom'
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart'
 import SellIcon from '@mui/icons-material/Sell'
-import VerifiedIcon from '@mui/icons-material/Verified'
+import useIsMobile from '../../hooks/useMobile'
+
 
 const HeroSection = () => {
     const navigate = useNavigate()
 
-const handleBuyClick = () => {
-localStorage.setItem('selectedRole','buyer');
-  navigate('/login');
-};
+    const isMobile=useIsMobile();
+    const handleBuyClick = () => {
+        localStorage.setItem('selectedRole', 'buyer');
+        navigate('/login');
+    };
 
-const handleSellClick = () => {
-    localStorage.setItem('selectedRole','seller')
-  navigate('/login');
-};
+    const handleSellClick = () => {
+        localStorage.setItem('selectedRole', 'seller')
+        navigate('/login');
+    };
 
     return (
-        <Box 
-            sx={{ 
+        <Box
+            sx={{
                 backgroundColor: '#fafafa',
-                pt: 3,
+                pt: isMobile?4:8,
                 pb: 2,
-                maxHeight:'100vh'
+                maxHeight: '100vh'
             }}
         >
             <Container maxWidth="xl">
-            
+
                 {/* Content Section */}
-                <Box sx={{ 
-                    display: 'flex', 
+                <Box sx={{
+                    display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     textAlign: 'center',
@@ -42,26 +43,12 @@ const handleSellClick = () => {
                     mx: 'auto',
                     px: { xs: 2, md: 4 }
                 }}>
-                    {/* Trust Badge */}
-                    <Chip 
-                        icon={<VerifiedIcon />}
-                        label="Trusted by 10,000+ Book Lovers"
-                        variant="outlined"
-                        sx={{ 
-                            mb: 3,
-                            backgroundColor: 'rgba(99, 102, 241, 0.05)',
-                            border: '1px solid rgba(99, 102, 241, 0.2)',
-                            color: '#374151',
-                            '& .MuiChip-icon': { color: '#6366f1' },
-                            fontWeight: 500
-                        }}
-                    />
 
                     {/* Main Heading */}
-                    <Typography 
-                        variant="h2" 
-                        component="h1" 
-                        sx={{ 
+                    <Typography
+                        variant="h2"
+                        component="h1"
+                        sx={{
                             fontWeight: 800,
                             color: '#1f2937',
                             mb: 3,
@@ -70,7 +57,7 @@ const handleSellClick = () => {
                         }}
                     >
                         Buy & Sell{' '}
-                        <Box component="span" sx={{ 
+                        <Box component="span" sx={{
                             background: 'linear-gradient(45deg, #6366f1, #8b5cf6)',
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
@@ -81,9 +68,9 @@ const handleSellClick = () => {
                     </Typography>
 
                     {/* Subtitle */}
-                    <Typography 
-                        variant="h6" 
-                        sx={{ 
+                    <Typography
+                        variant="h6"
+                        sx={{
                             color: '#6b7280',
                             mb: 5,
                             fontSize: { xs: '1.1rem', md: '1.25rem' },
@@ -92,15 +79,15 @@ const handleSellClick = () => {
                             maxWidth: 700
                         }}
                     >
-                        Discover amazing deals on quality books or turn your collection into cash. 
+                        Discover amazing deals on quality books or turn your collection into cash.
                         Join thousands of book lovers in our sustainable marketplace where every book finds a new home.
                     </Typography>
 
                     {/* Action Buttons */}
-                    <Box sx={{ 
-                        display: 'flex', 
-                        gap: 3, 
-                        mb: 6, 
+                    <Box sx={{
+                        display: 'flex',
+                        gap: 3,
+                        mb: 6,
                         flexWrap: 'wrap',
                         justifyContent: 'center'
                     }}>
@@ -108,6 +95,7 @@ const handleSellClick = () => {
                             variant="contained"
                             size="large"
                             startIcon={<ShoppingCartIcon />}
+                            fullWidth
                             onClick={handleBuyClick}
                             sx={{
                                 backgroundColor: '#6366f1',
@@ -134,6 +122,7 @@ const handleSellClick = () => {
                             variant="outlined"
                             size="large"
                             startIcon={<SellIcon />}
+                            fullWidth
                             onClick={handleSellClick}
                             sx={{
                                 borderColor: '#6366f1',
@@ -153,14 +142,14 @@ const handleSellClick = () => {
                                 },
                                 transition: 'all 0.3s ease'
                             }}
-                            
+
                         >
                             Sell Your Books
                         </Button>
                     </Box>
 
                     {/* Bottom Description */}
-                    <Box sx={{ 
+                    <Box sx={{
                         backgroundColor: '#f8fafc',
                         border: '1px solid #e2e8f0',
                         borderRadius: 3,
@@ -168,16 +157,16 @@ const handleSellClick = () => {
                         maxWidth: 800,
                         textAlign: 'center'
                     }}>
-                    
-                        <Typography variant="body1" sx={{ 
+
+                        <Typography variant="body1" sx={{
                             color: '#6b7280',
                             lineHeight: 1.7,
                             fontSize: '1.1rem'
                         }}>
-                            We connect book lovers across the community, making it easy to find your next great read 
+                            We connect book lovers across the community, making it easy to find your next great read
                             while giving old books new life. <strong>Sustainable, affordable, and supporting local readers!</strong>
                         </Typography>
-                    </Box> 
+                    </Box>
                 </Box>
             </Container>
         </Box>
