@@ -1,4 +1,3 @@
-
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
@@ -19,19 +18,24 @@ import MenuItem from '@mui/material/MenuItem'
 import Slider from '@mui/material/Slider'
 import Collapse from '@mui/material/Collapse'
 import IconButton from '@mui/material/IconButton'
+import CircularProgress from '@mui/material/CircularProgress'
+import Backdrop from '@mui/material/Backdrop'
+
 import SearchIcon from '@mui/icons-material/Search'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import ClearIcon from '@mui/icons-material/Clear'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
+import DiscountIcon from '@mui/icons-material/Discount'
+
 import { useNavigate, useParams } from 'react-router-dom'
-import DiscountIcon from '@mui/icons-material/Discount';
 import { useEffect, useState } from 'react'
 import { api } from '../api/api'
 import useMobile from '../../hooks/useMobile'
 
 const Books = () => {
   const navigate = useNavigate();
+  const isMobile = useMobile();
 
   const previewHandle = (bookID) => {
     navigate(`/book/${bookID}`);
@@ -45,16 +49,17 @@ const Books = () => {
 
   const [bookData, setBookData] = useState([]);
   const [filteredBooks, setFilteredBooks] = useState([]);
-  
-  // Search and filter states
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [priceRange, setPriceRange] = useState([0, 2000]);
   const [minDiscount, setMinDiscount] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
   const [maxPrice, setMaxPrice] = useState(2000);
+  const [loading, setLoading] = useState(false);
 
   const getAllBooks = async () => {
+    setLoading(true);
     try {
       const response = await api.get('/api/books', {
         headers: {
@@ -62,8 +67,7 @@ const Books = () => {
         }
       });
       setBookData(response.data.getAllBooks);
-      
-      // Calculate max price for slider
+
       if (response.data.getAllBooks.length > 0) {
         const max = Math.max(...response.data.getAllBooks.map(book => book.price));
         setMaxPrice(max);
@@ -71,34 +75,31 @@ const Books = () => {
       }
     } catch (error) {
       console.error("Failed to fetch books:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Filter function
   const filterBooks = () => {
     let filtered = [...bookData];
 
-    // Search by title
     if (searchQuery.trim()) {
-      filtered = filtered.filter(book => 
+      filtered = filtered.filter(book =>
         book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         book.author.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
-    // Filter by category
     if (selectedCategory !== 'All') {
-      filtered = filtered.filter(book => 
+      filtered = filtered.filter(book =>
         book.category?.toLowerCase() === selectedCategory.toLowerCase()
       );
     }
 
-    // Filter by price range
-    filtered = filtered.filter(book => 
+    filtered = filtered.filter(book =>
       book.price >= priceRange[0] && book.price <= priceRange[1]
     );
 
-    // Filter by minimum discount
     if (minDiscount > 0) {
       filtered = filtered.filter(book => {
         const discount = Math.round((1 - book.price / book.originalPrice) * 100);
@@ -109,7 +110,6 @@ const Books = () => {
     setFilteredBooks(filtered);
   };
 
-  // Clear all filters
   const clearFilters = () => {
     setSearchQuery('');
     setSelectedCategory('All');
@@ -125,25 +125,16 @@ const Books = () => {
     filterBooks();
   }, [bookData, searchQuery, selectedCategory, priceRange, minDiscount]);
 
-  useEffect(() => {
-    console.log(bookData);
-  }, [bookData]);
-
-  const isMobile=useMobile();
-
   return (
     <>
-      <Box
-        sx={{
-          backgroundColor: 'lightgray',
-          width: '100%',
-          height: '20px',
-        }}
-      >
-      </Box>
+      {/* Loading Spinner */}
+      <Backdrop open={loading} sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+        <CircularProgress color="primary" />
+      </Backdrop>
+
+      <Box sx={{ backgroundColor: 'lightgray', width: '100%', height: '20px' }} />
+
       <Container maxWidth={false} sx={{ maxWidth: '96%', mb: '20px' }}>
-        
-        {/* Search Bar */}
         <Box mt={2} mb={3}>
           <Stack direction="row" spacing={2} alignItems="center" justifyContent="center" mb={2}>
             <TextField
@@ -158,43 +149,36 @@ const Books = () => {
                 ),
                 endAdornment: searchQuery && (
                   <InputAdornment position="end">
-                    <IconButton
-                      size="small"
-                      onClick={() => setSearchQuery('')}
-                    >
+                    <IconButton size="small" onClick={() => setSearchQuery('')}>
                       <ClearIcon />
                     </IconButton>
                   </InputAdornment>
                 ),
               }}
-              sx={{ 
+              sx={{
                 width: { xs: '100%', sm: '400px', md: '500px' },
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
                 }
               }}
             />
-            
+
             <Button
               variant="outlined"
               startIcon={<FilterListIcon />}
               endIcon={showFilters ? <ExpandLessIcon /> : <ExpandMoreIcon />}
               onClick={() => setShowFilters(!showFilters)}
-              sx={{ 
-                minWidth: 120,
-                borderRadius: 2,
-              }}
+              sx={{ minWidth: 120, borderRadius: 2 }}
             >
               Filters
             </Button>
           </Stack>
 
-          {/* Filter Section */}
+          {/* Filters */}
           <Collapse in={showFilters}>
             <Box sx={{ mt: 3, mb: 2 }}>
               <Grid container spacing={3} alignItems="center">
-                {/* Category Filter */}
-                <Grid size ={{xs:12 ,sm:6 ,md:3}}>
+                <Grid size={{xs:12,sm:6,md:3}}>
                   <FormControl fullWidth>
                     <InputLabel>Category</InputLabel>
                     <Select
@@ -204,16 +188,13 @@ const Books = () => {
                       sx={{ borderRadius: 2 }}
                     >
                       {category.map((cat) => (
-                        <MenuItem key={cat} value={cat}>
-                          {cat}
-                        </MenuItem>
+                        <MenuItem key={cat} value={cat}>{cat}</MenuItem>
                       ))}
                     </Select>
                   </FormControl>
                 </Grid>
 
-                {/* Price Range Filter */}
-                <Grid size ={{xs:12 ,sm:6 ,md:4}}>
+                <Grid size={{xs:12,sm:6,md:4}}>
                   <Typography gutterBottom variant="body2" color="text.secondary">
                     Price Range: ₹{priceRange[0]} - ₹{priceRange[1]}
                   </Typography>
@@ -229,8 +210,7 @@ const Books = () => {
                   />
                 </Grid>
 
-                {/* Discount Filter */}
-                <Grid size ={{xs:12 ,sm:6 ,md:3}}>
+                <Grid size={{xs:12,sm:6,md:3}}>
                   <Typography gutterBottom variant="body2" color="text.secondary">
                     Minimum Discount: {minDiscount}%
                   </Typography>
@@ -246,16 +226,12 @@ const Books = () => {
                   />
                 </Grid>
 
-                {/* Clear Filters */}
-                <Grid size ={{xs:12 ,sm:6 ,md:2}}>
+                <Grid size={{xs:12,sm:6,md:2}}>
                   <Button
                     variant="text"
                     color="secondary"
                     onClick={clearFilters}
-                    sx={{ 
-                      textTransform: 'none',
-                      fontWeight: 600,
-                    }}
+                    sx={{ textTransform: 'none', fontWeight: 600 }}
                   >
                     Clear All
                   </Button>
@@ -266,31 +242,30 @@ const Books = () => {
         </Box>
 
         <Box mt={2}>
-          
           {filteredBooks.length === 0 ? (
             <Box textAlign="center" py={4}>
               <Typography variant="h6" color="text.secondary">
                 No books found matching your criteria
               </Typography>
-              <Button 
-                variant="outlined" 
-                onClick={clearFilters} 
+              <Button
+                variant="outlined"
+                onClick={clearFilters}
                 sx={{ mt: 2 }}
               >
                 Clear Filters
               </Button>
             </Box>
           ) : (
-            <Grid container spacing={2} pt={1} justifyContent={isMobile?'center':false}>
+            <Grid container spacing={2} pt={1} justifyContent={isMobile ? 'center' : false}>
               {filteredBooks.map((book, index) => (
-                <Grid size={{ xs: 11, sm: 6, md: 2.3 }} key={index}>
-                  <Box sx={{position:'relative',top:'40px',left:'7px'}}>
-                    <Chip 
-                      label={book.isOrdered?"Not Available":"Available"} 
-                      variant='outlined' 
-                      size='medium' 
-                      color={book.isOrdered?'error':'success'}  
-                      sx={{background:'white'}}
+                <Grid size={{xs:12,sm:6,md:2.3}} key={index}>
+                  <Box sx={{ position: 'relative', top: '40px', left: '7px' }}>
+                    <Chip
+                      label={book.isOrdered ? "Not Available" : "Available"}
+                      variant='outlined'
+                      size='medium'
+                      color={book.isOrdered ? 'error' : 'success'}
+                      sx={{ background: 'white' }}
                     />
                   </Box>
                   <Card>
@@ -300,58 +275,38 @@ const Books = () => {
                       image={book.images && book.images.length > 0 ? book.images[0] : ''}
                       alt={book.title}
                     />
-
                     <CardContent>
                       <Typography variant="h6">
                         {book.title.length > 14 ? `${book.title.slice(0, 20)}...` : book.title}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Author: {book.author}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Edition: {book.edition}
-                      </Typography>
+                      <Typography variant="body2" color="text.secondary">Author: {book.author}</Typography>
+                      <Typography variant="body2" color="text.secondary">Edition: {book.edition}</Typography>
                       <Stack direction='row' gap={1} mt={1}>
                         <Typography
                           variant="body1"
-                          sx={{
-                            textDecoration: 'line-through',
-                            color: 'gray',
-                            fontWeight: 500,
-                          }}
+                          sx={{ textDecoration: 'line-through', color: 'gray', fontWeight: 500 }}
                         >
                           ₹{book.originalPrice}
                         </Typography>
-
                         <Typography
                           variant="body2"
-                          sx={{
-                            color: 'black',
-                            fontWeight: 'bold',
-                            fontSize: '1.2rem',
-                          }}
+                          sx={{ color: 'black', fontWeight: 'bold', fontSize: '1.2rem' }}
                         >
                           ₹{book.price}
                         </Typography>
-
                         <Chip
                           icon={<DiscountIcon />}
                           size='small'
                           label={`${Math.round((1 - book.price / book.originalPrice) * 100)}% OFF`}
                           color="success"
                           variant='outlined'
-                          sx={{
-                            fontWeight: 'bold',
-                          }}
+                          sx={{ fontWeight: 'bold' }}
                         />
                       </Stack>
                     </CardContent>
-
                     <CardActions>
-                 
-                      <Button size={isMobile?'large':'medium'} variant='outlined' onClick={() => previewHandle(book._id)} fullWidth>Preview</Button>
-                      <Button size={isMobile?'large':'medium'}   variant='outlined' onClick={() => detailsHandle(book._id)} fullWidth>In Detail</Button>
-                   
+                      <Button size={isMobile ? 'large' : 'medium'} variant='outlined' onClick={() => previewHandle(book._id)} fullWidth>Preview</Button>
+                      <Button size={isMobile ? 'large' : 'medium'} variant='outlined' onClick={() => detailsHandle(book._id)} fullWidth>In Detail</Button>
                     </CardActions>
                   </Card>
                 </Grid>
@@ -364,4 +319,4 @@ const Books = () => {
   )
 }
 
-export default Books
+export default Books;
