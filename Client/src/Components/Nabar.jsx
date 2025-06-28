@@ -174,6 +174,7 @@ const PrimarySearchAppBar = () => {
                         onClick={toggleMobileMenu}
                         sx={{ 
                             mr: 2, 
+                            ml:1,
                             display: { md: 'none' },
                             color: 'text.primary'
                         }}
@@ -187,7 +188,7 @@ const PrimarySearchAppBar = () => {
                         src={logo}
                         alt="Bookish Logo"
                         sx={{
-                            height: { xs: 40, sm: 50, md: 70 },
+                            height: { xs: 60, sm: 50, md: 70 },
                             display: 'block',
                             cursor: 'pointer',
                             mr: { xs: 1, sm: 2, md: 3 }

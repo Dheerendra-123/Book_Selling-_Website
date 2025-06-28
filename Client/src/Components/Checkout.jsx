@@ -1,4 +1,4 @@
- 
+
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
@@ -43,25 +43,25 @@ const Checkout = () => {
     city: '',
     state: '',
     pincode: '',
-    paymentMethod: 'card',  
-    cardNumber: '',        
-    expiryDate: '',         
-    cvv: '',                
-    cardholderName: '',     
-    upiId: ''               
+    paymentMethod: 'card',
+    cardNumber: '',
+    expiryDate: '',
+    cvv: '',
+    cardholderName: '',
+    upiId: ''
   });
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const steps = ['Address Details', 'Order Summary', 'Payment'];
   const orderListItems = useSelector((state) => state.cart.items);
   const dispatch = useDispatch();
-  
+
   // FIX 1: Prevent multiple cart fetches
   const hasFetchedCart = useRef(false);
 
   useEffect(() => {
     // Only fetch cart once
     if (hasFetchedCart.current) return;
-    
+
     const fetchCart = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -73,7 +73,7 @@ const Checkout = () => {
         hasFetchedCart.current = true
       } catch (err) {
         console.error('Failed to load cart:', err);
-        hasFetchedCart.current = true; 
+        hasFetchedCart.current = true;
       }
     };
 
@@ -91,7 +91,7 @@ const Checkout = () => {
   // FIX 3: Stable event handlers
   const handleInputChange = useCallback((event) => {
     const { name, value } = event.target;
-    
+
     setFormData(prevData => {
       const newData = { ...prevData, [name]: value };
       return newData;
@@ -272,8 +272,8 @@ const Checkout = () => {
                 <ListItemAvatar>
                   <Avatar
                     alt={item.title}
-                    src={item.images?.[0]} 
-                    variant="rounded" 
+                    src={item.images?.[0]}
+                    variant="rounded"
                   />
                 </ListItemAvatar>
                 <ListItemText
@@ -478,6 +478,7 @@ const Checkout = () => {
               variant="contained"
               onClick={handlePayment}
               size="large"
+              disabled={!formData.paymentMethod}
             >
               Place Order
             </Button>

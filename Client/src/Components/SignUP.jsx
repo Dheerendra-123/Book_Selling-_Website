@@ -24,6 +24,7 @@ import Button from '@mui/material/Button';
 import { handleError, handleSuccess } from '../Utils/Tostify';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Link, useNavigate } from 'react-router-dom';
+import useMobile from '../../hooks/useMobile';
 
 const SignUP = () => {
 
@@ -52,6 +53,8 @@ const SignUP = () => {
         })
     }
 
+   
+    const isMobile=useMobile();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -77,10 +80,19 @@ const SignUP = () => {
 
 
     return (
-        <Container maxWidth="sm" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '90vh' }}>
+        <Box
+            maxWidth="sm"
+            sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh',
+                margin: '0 auto',
+            }}
+        >
             <Paper elevation={2} sx={{
-                p: { xs: 2.5, sm: 3 },
-                width: '80%',
+                p: { xs: 2, sm: 3 },
+                width: isMobile ? '90%' : '70%',
                 height: 'auto',
                 borderRadius: 2,
                 boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
@@ -167,8 +179,8 @@ const SignUP = () => {
                             />
 
                         </FormControl>
-                        <Button type='submit' variant='contained' size='large'   disabled={isloading}>
-                             {isloading ? <CircularProgress size={25} color='inherit' /> : 'Sign Up'}
+                        <Button type='submit' variant='contained' size='large' disabled={isloading}>
+                            {isloading ? <CircularProgress size={25} color='inherit' /> : 'Sign Up'}
                         </Button>
                         <Box sx={{ textAlign: 'center' }}>
                             <Typography variant='h7' color='grey'>
@@ -181,7 +193,7 @@ const SignUP = () => {
                     </Stack>
                 </Box>
             </Paper>
-        </Container >
+        </Box >
     )
 }
 

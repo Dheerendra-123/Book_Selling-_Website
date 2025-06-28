@@ -19,8 +19,14 @@ import {
   CalendarToday,
   AccountCircle
 } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 const Profile = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+
   const [userInfo, setUserInfo] = useState({
     name: '',
     email: '',
@@ -72,7 +78,7 @@ const Profile = () => {
     if (!timestamp) return 'N/A';
     return new Date(timestamp * 1000).toLocaleDateString('en-US', {
       year: 'numeric',
-      month: 'long',
+      month: isMobile ? 'short' : 'long',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
@@ -90,61 +96,117 @@ const Profile = () => {
   };
 
   return (
-    <Container maxWidth="md" >
+    <Container 
+      maxWidth="md" 
+      sx={{ 
+        px: { xs: 1, sm: 2, md: 3 },
+        py: { xs: 2, sm: 3, md: 4 }
+      }}
+    >
       {/* Header Section */}
-      <Box textAlign="center" mb={4}>
-        <Typography variant="h4" component="h1" gutterBottom color="primary">
+      <Box textAlign="center" mb={{ xs: 3, sm: 4 }}>
+        <Typography 
+          variant={isMobile ? "h5" : "h4"} 
+          component="h1" 
+          gutterBottom 
+          color="primary"
+          sx={{ fontWeight: 600 }}
+        >
           My Profile
         </Typography>
-        <Typography variant="subtitle1" color="text.secondary">
+        <Typography 
+          variant={isMobile ? "body2" : "subtitle1"} 
+          color="text.secondary"
+          sx={{ px: { xs: 2, sm: 0 } }}
+        >
           View your account information and details
         </Typography>
       </Box>
 
       {/* Profile Card */}
-      <Card elevation={3} sx={{ mb: 3 }}>
-        <CardContent sx={{ p: 4 }}>
+      <Card 
+        elevation={3} 
+        sx={{ 
+          mb: { xs: 2, sm: 3 },
+          borderRadius: { xs: 2, sm: 3 }
+        }}
+      >
+        <CardContent sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
           {/* Avatar and Basic Info */}
-          <Stack direction="row" spacing={3} alignItems="center" mb={3}>
+          <Stack 
+            direction={{ xs: "column", sm: "row" }} 
+            spacing={{ xs: 2, sm: 3 }} 
+            alignItems="center" 
+            mb={{ xs: 2, sm: 3 }}
+            textAlign={{ xs: "center", sm: "left" }}
+          >
             <Avatar
               sx={{
-                width: 80,
-                height: 80,
+                width: { xs: 60, sm: 70, md: 80 },
+                height: { xs: 60, sm: 70, md: 80 },
                 bgcolor: 'primary.main',
-                fontSize: '1.5rem',
+                fontSize: { xs: '1.2rem', sm: '1.3rem', md: '1.5rem' },
                 fontWeight: 'bold'
               }}
             >
               {getInitials(userInfo.name)}
             </Avatar>
             <Box>
-                <Typography variant='h5' color='text.secondary'> {userInfo.name}</Typography>
+              <Typography 
+                variant={isMobile ? 'h6' : 'h5'} 
+                color='text.secondary'
+                sx={{ 
+                  fontWeight: 500,
+                  wordBreak: 'break-word'
+                }}
+              > 
+                {userInfo.name}
+              </Typography>
             </Box>
           </Stack>
 
-          <Divider sx={{ my: 3 }} />
+          <Divider sx={{ my: { xs: 2, sm: 3 } }} />
 
           {/* User Details Grid */}
-          <Grid container spacing={3}>
+          <Grid container spacing={{ xs: 2, sm: 3 }}>
             {/* Name */}
-            <Grid size={{xs:12,sm:6,md:6}}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Paper
                 elevation={0}
                 sx={{
-                  p: 2,
+                  p: { xs: 1.5, sm: 2 },
                   bgcolor: 'grey.50',
                   borderRadius: 2,
                   border: '1px solid',
-                  borderColor: 'grey.200'
+                  borderColor: 'grey.200',
+                  height: '100%'
                 }}
               >
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <Person color="primary" />
-                  <Box>
-                    <Typography variant="body2" color="text.secondary">
+                <Stack 
+                  direction="row" 
+                  spacing={{ xs: 1.5, sm: 2 }} 
+                  alignItems="center"
+                >
+                  <Person 
+                    color="primary" 
+                    sx={{ fontSize: { xs: '20px', sm: '24px' } }}
+                  />
+                  <Box sx={{ minWidth: 0, flex: 1 }}>
+                    <Typography 
+                      variant="body2" 
+                      color="text.secondary"
+                      sx={{ fontSize: { xs: '12px', sm: '14px' } }}
+                    >
                       Full Name
                     </Typography>
-                    <Typography variant="body1" fontWeight="medium">
+                    <Typography 
+                      variant="body1" 
+                      fontWeight="medium"
+                      sx={{ 
+                        fontSize: { xs: '14px', sm: '16px' },
+                        wordBreak: 'break-word'
+                      }}
+                    >
                       {userInfo.name}
                     </Typography>
                   </Box>
@@ -153,24 +215,43 @@ const Profile = () => {
             </Grid>
 
             {/* Email */}
-            <Grid size={{xs:12,sm:6,md:6}}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Paper
                 elevation={0}
                 sx={{
-                  p: 2,
+                  p: { xs: 1.5, sm: 2 },
                   bgcolor: 'grey.50',
                   borderRadius: 2,
                   border: '1px solid',
-                  borderColor: 'grey.200'
+                  borderColor: 'grey.200',
+                  height: '100%'
                 }}
               >
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <Email color="primary" />
-                  <Box>
-                    <Typography variant="body2" color="text.secondary">
+                <Stack 
+                  direction="row" 
+                  spacing={{ xs: 1.5, sm: 2 }} 
+                  alignItems="center"
+                >
+                  <Email 
+                    color="primary" 
+                    sx={{ fontSize: { xs: '20px', sm: '24px' } }}
+                  />
+                  <Box sx={{ minWidth: 0, flex: 1 }}>
+                    <Typography 
+                      variant="body2" 
+                      color="text.secondary"
+                      sx={{ fontSize: { xs: '12px', sm: '14px' } }}
+                    >
                       Email Address
                     </Typography>
-                    <Typography variant="body1" fontWeight="medium">
+                    <Typography 
+                      variant="body1" 
+                      fontWeight="medium"
+                      sx={{ 
+                        fontSize: { xs: '14px', sm: '16px' },
+                        wordBreak: 'break-all'
+                      }}
+                    >
                       {userInfo.email}
                     </Typography>
                   </Box>
@@ -179,24 +260,46 @@ const Profile = () => {
             </Grid>
 
             {/* User ID */}
-            <Grid size={{xs:12,sm:6,md:6}}>
+            <Grid size={{ xs: 12, sm: 6, md: 12 }}>
               <Paper
                 elevation={0}
                 sx={{
-                  p: 2,
+                  p: { xs: 1.5, sm: 2 },
                   bgcolor: 'grey.50',
                   borderRadius: 2,
                   border: '1px solid',
                   borderColor: 'grey.200'
                 }}
               >
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <Badge color="primary" />
-                  <Box>
-                    <Typography variant="body2" color="text.secondary">
+                <Stack 
+                  direction="row" 
+                  spacing={{ xs: 1.5, sm: 2 }} 
+                  alignItems="center"
+                >
+                  <Badge 
+                    color="primary" 
+                    sx={{ fontSize: { xs: '20px', sm: '24px' } }}
+                  />
+                  <Box sx={{ minWidth: 0, flex: 1 }}>
+                    <Typography 
+                      variant="body2" 
+                      color="text.secondary"
+                      sx={{ fontSize: { xs: '12px', sm: '14px' } }}
+                    >
                       User ID
                     </Typography>
-                    <Typography variant="body1" fontWeight="medium" sx={{ fontFamily: 'monospace' }}>
+                    <Typography 
+                      variant="body1" 
+                      fontWeight="medium" 
+                      sx={{ 
+                        fontFamily: 'monospace',
+                        fontSize: { xs: '12px', sm: '14px', md: '16px' },
+                        wordBreak: 'break-all',
+                        bgcolor: { xs: 'grey.100', sm: 'transparent' },
+                        p: { xs: 0.5, sm: 0 },
+                        borderRadius: { xs: 1, sm: 0 }
+                      }}
+                    >
                       {userInfo.userId}
                     </Typography>
                   </Box>
@@ -208,37 +311,104 @@ const Profile = () => {
       </Card>
 
       {/* Session Information */}
-      <Card elevation={2}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom color="primary">
+      <Card 
+        elevation={2}
+        sx={{ borderRadius: { xs: 2, sm: 3 } }}
+      >
+        <CardContent sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
+          <Typography 
+            variant={isMobile ? "subtitle1" : "h6"} 
+            gutterBottom 
+            color="primary"
+            sx={{ 
+              fontWeight: 600,
+              mb: { xs: 2, sm: 3 }
+            }}
+          >
             Session Information
           </Typography>
-          <Grid container spacing={2}>
-            <Grid size={{xs:12,sm:6,md:6}}>
-              <Stack direction="row" spacing={2} alignItems="center">
-                <CalendarToday color="action" fontSize="small" />
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    Token Issued
-                  </Typography>
-                  <Typography variant="body2">
-                    {formatDate(userInfo.iat)}
-                  </Typography>
-                </Box>
-              </Stack>
+          <Grid container spacing={{ xs: 2, sm: 3 }}>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: { xs: 1.5, sm: 2 },
+                  bgcolor: 'action.hover',
+                  borderRadius: 2,
+                  height: '100%'
+                }}
+              >
+                <Stack 
+                  direction="row" 
+                  spacing={{ xs: 1.5, sm: 2 }} 
+                  alignItems="center"
+                >
+                  <CalendarToday 
+                    color="action" 
+                    fontSize="small"
+                    sx={{ fontSize: { xs: '18px', sm: '20px' } }}
+                  />
+                  <Box>
+                    <Typography 
+                      variant="body2" 
+                      color="text.secondary"
+                      sx={{ fontSize: { xs: '12px', sm: '14px' } }}
+                    >
+                      Token Issued
+                    </Typography>
+                    <Typography 
+                      variant="body2"
+                      sx={{ 
+                        fontSize: { xs: '12px', sm: '14px' },
+                        fontWeight: 500
+                      }}
+                    >
+                      {formatDate(userInfo.iat)}
+                    </Typography>
+                  </Box>
+                </Stack>
+              </Paper>
             </Grid>
-            <Grid size={{xs:12,sm:6,md:6}}>
-              <Stack direction="row" spacing={2} alignItems="center">
-                <CalendarToday color="action" fontSize="small" />
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    Token Expires
-                  </Typography>
-                  <Typography variant="body2">
-                    {formatDate(userInfo.exp)}
-                  </Typography>
-                </Box>
-              </Stack>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: { xs: 1.5, sm: 2 },
+                  bgcolor: 'action.hover',
+                  borderRadius: 2,
+                  height: '100%'
+                }}
+              >
+                <Stack 
+                  direction="row" 
+                  spacing={{ xs: 1.5, sm: 2 }} 
+                  alignItems="center"
+                >
+                  <CalendarToday 
+                    color="action" 
+                    fontSize="small"
+                    sx={{ fontSize: { xs: '18px', sm: '20px' } }}
+                  />
+                  <Box>
+                    <Typography 
+                      variant="body2" 
+                      color="text.secondary"
+                      sx={{ fontSize: { xs: '12px', sm: '14px' } }}
+                    >
+                      Token Expires
+                    </Typography>
+                    <Typography 
+                      variant="body2"
+                      sx={{ 
+                        fontSize: { xs: '12px', sm: '14px' },
+                        fontWeight: 500
+                      }}
+                    >
+                      {formatDate(userInfo.exp)}
+                    </Typography>
+                  </Box>
+                </Stack>
+              </Paper>
             </Grid>
           </Grid>
         </CardContent>
