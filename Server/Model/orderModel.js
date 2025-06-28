@@ -32,13 +32,7 @@ const orderSchema = new mongoose.Schema({
     enum: ['card', 'upi', 'cod'],
     required: true
   },
-  isPaid: {
-    type: Boolean,
-    default: false
-  },
-  paidAt: {
-    type: Date
-  },
+
   totalAmount: {
     type: Number,
     required: true

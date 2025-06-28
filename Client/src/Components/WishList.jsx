@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const WishList = () => {
   const wishList = useSelector(state => state.wishlist.items);
-const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   const token = localStorage.getItem('token');
   const getWishList = async () => {
@@ -27,41 +27,35 @@ const dispatch = useDispatch();
     getWishList();
   }, []);
 
-const handleDelete = async (bookId) => {
-  try {
-    const res = await api.delete('/api/wishlist/remove', {
-      headers: { Authorization: `Bearer ${token}` },
-      data: { bookId },
-    });
+  const handleDelete = async (bookId) => {
+    try {
+      const res = await api.delete('/api/wishlist/remove', {
+        headers: { Authorization: `Bearer ${token}` },
+        data: { bookId },
+      });
 
-    if (res.data.success) {
-      handleSuccess(res.data.message);
-      dispatch(removeFromWishList(bookId)); // 👈 Remove from Redux
+      if (res.data.success) {
+        handleSuccess(res.data.message);
+        dispatch(removeFromWishList(bookId)); // 👈 Remove from Redux
+      }
+    } catch (error) {
+      console.log(error);
+      handleError(error);
     }
-  } catch (error) {
-    console.log(error);
-    handleError(error);
-  }
-};
+  };
 
 
   return (
     <Box>
       <Box>
-        <Typography
-          variant="h4"
-          fontWeight={700}
-          color="text.secondary"
-          textAlign="center"
-          gutterBottom
-        >
+        <Typography variant="h4" component="h1" gutterBottom color="primary" textAlign='center'>
           WishList
         </Typography>
       </Box>
 
       <Grid container spacing={2} mt={3}>
         {wishList.map((book, index) => (
-          <Grid size={{xs:12,sm:4,md:3,lg:3}} key={index}>
+          <Grid size={{ xs: 12, sm: 4, md: 3, lg: 3 }} key={index}>
             {/* Wrapper Box for relative positioning */}
             <Box position="relative">
               {/* Delete Icon Positioned Top-Right */}

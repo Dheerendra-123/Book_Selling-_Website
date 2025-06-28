@@ -41,6 +41,9 @@ const BooksListed = () => {
   return (
    
         <Box mt={2}>
+         <Typography variant="h4" component="h1" gutterBottom color="primary" textAlign='center'>
+          Books Listed
+        </Typography>
           <Grid container spacing={2} pt={3}>
             {bookData.map((book, index) => (
               <Grid size={{ xs: 12, sm: 5, md: 2.5 }} key={index}>

@@ -18,10 +18,9 @@ import SellBookForm from './Components/SellBookForm';
 import PublicOnlyRoute from './Utils/PublicOnlyRoute';
 import Dashboard from './Components/Dashbord';
 import WishList from './Components/wishList';
-import Analytics from './Components/Analytics';
+import Profile from './Components/Profile';
 import MyOrders from './Components/MyOrders';
 import BooksListed from './Components/BooksListed';
-import ConfirmOrder from './Components/ConfirmOrder';
 import Checkout from './Components/Checkout';
 
 const App = () => {
@@ -104,7 +103,7 @@ const App = () => {
               index: true,
               element: (
                 <ProtectedRoute>
-                  <Analytics />
+                  <Profile />
                 </ProtectedRoute>
 
               )
@@ -136,14 +135,7 @@ const App = () => {
               ),
             },
 
-            {
-              path: 'confirm',
-              element: (
-                <ProtectedRoute>
-                  <ConfirmOrder />
-                </ProtectedRoute>
-              ),
-            },
+      
           ],
         }
 

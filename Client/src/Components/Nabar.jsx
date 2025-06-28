@@ -1,98 +1,91 @@
 import * as React from 'react';
-import { styled } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
-import InputBase from '@mui/material/InputBase';
 import Badge from '@mui/material/Badge';
-import SearchIcon from '@mui/icons-material/Search';
+import Typography from '@mui/material/Typography';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Drawer from '@mui/material/Drawer';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Divider from '@mui/material/Divider';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
+import MenuIcon from '@mui/icons-material/Menu';
+import { LogoutOutlined, SellOutlined, Home } from '@mui/icons-material';
 import logo from '../assets/logo.jpg';
-import Typography from '@mui/material/Typography';
 import { useNavigate } from 'react-router-dom';
-import { Menu, MenuItem, Stack } from '@mui/material';
 import { handleSuccess } from '../Utils/Tostify';
 import { useSelector, useDispatch } from 'react-redux';
-import { setCartItems } from '../../redux/cartSlice'; // ✅ import setCartItems
+import { setCartItems } from '../../redux/cartSlice';
 import { api } from '../api/api';
-import { LogoutOutlined, SellOutlined } from '@mui/icons-material';
-
-
-
-const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: '#f0f7f6',
-    '&:hover': {
-        backgroundColor: '#f7f7f7',
-    },
-    marginRight: theme.spacing(2),
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-        marginLeft: theme.spacing(3),
-        width: 'auto',
-    },
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: '#555',
-    fontWeight: 500,
-    '& .MuiInputBase-input': {
-        padding: theme.spacing(1, 1, 1, 0),
-        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-        transition: theme.transitions.create('width'),
-        width: '100%',
-        [theme.breakpoints.up('sm')]: {
-            width: '30ch',
-        },
-        [theme.breakpoints.up('md')]: {
-            width: '50ch',
-        },
-    },
-}));
+import { Stack } from '@mui/material';
 
 const PrimarySearchAppBar = () => {
-
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    
+    // State for mobile menu
+    const [mobileOpen, setMobileOpen] = React.useState(false);
+    const [accountMenuAnchor, setAccountMenuAnchor] = React.useState(null);
+    
+    const cartItems = useSelector((state) => state.cart.items);
+    const isAccountMenuOpen = Boolean(accountMenuAnchor);
 
+    // Navigation handlers
     const cartHandle = () => {
         navigate('/cart');
+        setMobileOpen(false);
     };
 
     const handleLogo = () => {
         navigate('/home');
+        setMobileOpen(false);
     };
 
-    const handleAccountClick = () => {
-        navigate('/dashboard')
-    }
+    const handleAccountClick = (event) => {
+        if (window.innerWidth >= 960) { // md breakpoint
+            navigate('/dashboard');
+        } else {
+            setAccountMenuAnchor(event.currentTarget);
+        }
+    };
+
+    const handleAccountMenuClose = () => {
+        setAccountMenuAnchor(null);
+    };
+
+    const handleDashboard = () => {
+        navigate('/dashboard');
+        handleAccountMenuClose();
+        setMobileOpen(false);
+    };
 
     const handleLogout = () => {
         localStorage.removeItem('token');
-        localStorage.removeItem('selectedRole')
+        localStorage.removeItem('selectedRole');
         setTimeout(() => {
             navigate('/home');
             handleSuccess('Successfully Logout');
         }, 200);
+        setMobileOpen(false);
+        handleAccountMenuClose();
     };
 
-    const cartItems = useSelector((state) => state.cart.items);
+    const handleSellBook = () => {
+        navigate('/sell-form');
+        setMobileOpen(false);
+    };
 
-    // ✅ Fetch cart data on navbar load if token exists
+    const toggleMobileMenu = () => {
+        setMobileOpen(!mobileOpen);
+    };
+
+    // Fetch cart data on navbar load if token exists
     React.useEffect(() => {
         const fetchCart = async () => {
             const token = localStorage.getItem('token');
@@ -113,159 +106,282 @@ const PrimarySearchAppBar = () => {
         fetchCart();
     }, [dispatch]);
 
+    // Mobile drawer content
+    const mobileMenu = (
+        <Box sx={{ width: 280 }} role="presentation">
+            <Box sx={{ p: 2, display: 'flex', alignItems: 'center' }}>
+                <Box
+                    component="img"
+                    src={logo}
+                    alt="Bookish Logo"
+                    sx={{ height: 50, mr: 2 }}
+                />
+               
+            </Box>
+            <Divider />
+            <List>
+                <ListItem button onClick={handleLogo}>
+                    <ListItemIcon>
+                        <Home />
+                    </ListItemIcon>
+                    <ListItemText primary="Home" />
+                </ListItem>
+               
+                <ListItem button onClick={handleSellBook}>
+                    <ListItemIcon>
+                        <SellOutlined />
+                    </ListItemIcon>
+                    <ListItemText primary="Sell Book" />
+                </ListItem>
+                
+                <ListItem button onClick={cartHandle}>
+                    <ListItemIcon>
+                        <Badge badgeContent={cartItems.length} color="error">
+                            <ShoppingCartOutlinedIcon />
+                        </Badge>
+                    </ListItemIcon>
+                    <ListItemText primary="Cart" />
+                </ListItem>
+                
+                <ListItem button onClick={handleDashboard}>
+                    <ListItemIcon>
+                        <AccountCircleOutlinedIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="My Account" />
+                </ListItem>
+            </List>
+            <Divider />
+            <List>
+                <ListItem button onClick={handleLogout}>
+                    <ListItemIcon>
+                        <LogoutOutlined />
+                    </ListItemIcon>
+                    <ListItemText primary="Logout" />
+                </ListItem>
+            </List>
+        </Box>
+    );
+
     return (
         <Box sx={{ flexGrow: 1 }}>
-            <AppBar position="static" sx={{ backgroundColor: 'white' }}>
-                <Toolbar>
+            <AppBar position="static" sx={{ backgroundColor: 'white', boxShadow: 1 }}>
+                <Toolbar sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
+                    {/* Mobile menu button */}
+                    <IconButton
+                        color="inherit"
+                        aria-label="open drawer"
+                        edge="start"
+                        onClick={toggleMobileMenu}
+                        sx={{ 
+                            mr: 2, 
+                            display: { md: 'none' },
+                            color: 'text.primary'
+                        }}
+                    >
+                        <MenuIcon />
+                    </IconButton>
+
+                    {/* Logo - visible on all screens but responsive sizing */}
                     <Box
                         component="img"
                         src={logo}
                         alt="Bookish Logo"
-                        mr={3}
                         sx={{
-                            height: 70,
-                            display: { xs: 'none', sm: 'block' },
+                            height: { xs: 40, sm: 50, md: 70 },
+                            display: 'block',
                             cursor: 'pointer',
+                            mr: { xs: 1, sm: 2, md: 3 }
                         }}
                         onClick={handleLogo}
                     />
 
-                    <Search>
-                        <SearchIconWrapper>
-                            <SearchIcon sx={{ color: '#555' }} />
-                        </SearchIconWrapper>
-                        <StyledInputBase
-                            placeholder="Search…"
-                            inputProps={{ 'aria-label': 'search' }}
-                        />
-                    </Search>
-
-
+                
 
                     <Box sx={{ flexGrow: 1 }} />
+
+                    {/* Desktop menu items */}
                     <Box
-                        sx={{ display: { xs: 'none', md: 'flex' } }}
-
-                        alignItems="center"
+                        sx={{ 
+                            display: { xs: 'none', md: 'flex' },
+                            alignItems: 'center',
+                            gap: 1
+                        }}
                     >
-
-                        <IconButton size="large" color="grey"
+                        {/* Sell Book */}
+                        <IconButton
+                            size="large"
+                            color="inherit"
                             disableRipple
                             sx={{
-                                boxShadow: 'none',
+                                color: 'text.secondary',
+                                flexDirection: 'column',
+                                borderRadius: 2,
+                                px: 2,
+                                py: 1,
                                 '&:hover': {
-                                    boxShadow: 'none',
-                                    backgroundColor: 'transparent',
-                                },
-                                '&:active': {
-                                    boxShadow: 'none',
-                                    backgroundColor: 'transparent',
+                                    backgroundColor: 'action.hover',
                                 },
                             }}
-                            onClick={() => navigate('/sell-form')}
+                            onClick={handleSellBook}
                         >
-
-                            <SellOutlined
-                                sx={{ fontSize: '26px' }}
-                                onClick={cartHandle}
-                            />
-
-                            <Typography variant="body1" color="text.secondary" ml={1}>
+                            <SellOutlined sx={{ fontSize: '26px' }} />
+                            <Typography variant="caption" sx={{ mt: 0.5 }}>
                                 Sell Book
                             </Typography>
                         </IconButton>
 
-                        <IconButton size="large" color="grey"
+                        {/* Cart */}
+                        <IconButton
+                            size="large"
+                            color="inherit"
                             disableRipple
                             sx={{
-                                boxShadow: 'none',
+                                color: 'text.secondary',
+                                flexDirection: 'column',
+                                borderRadius: 2,
+                                px: 2,
+                                py: 1,
                                 '&:hover': {
-                                    boxShadow: 'none',
-                                    backgroundColor: 'transparent',
-                                },
-                                '&:active': {
-                                    boxShadow: 'none',
-                                    backgroundColor: 'transparent',
+                                    backgroundColor: 'action.hover',
                                 },
                             }}
+                            onClick={cartHandle}
                         >
                             <Badge badgeContent={cartItems.length} color="error">
-                                <ShoppingCartOutlinedIcon
-                                    sx={{ fontSize: '30px' }}
-                                    onClick={cartHandle}
-                                />
+                                <ShoppingCartOutlinedIcon sx={{ fontSize: '30px' }} />
                             </Badge>
-                            <Typography variant="body1" color="text.secondary" ml={1}>
+                            <Typography variant="caption" sx={{ mt: 0.5 }}>
                                 Cart
                             </Typography>
-
                         </IconButton>
 
+                        {/* Account */}
+                        <IconButton
+                            size="large"
+                            color="inherit"
+                            disableRipple
+                            sx={{
+                                color: 'text.secondary',
+                                flexDirection: 'column',
+                                borderRadius: 2,
+                                px: 2,
+                                py: 1,
+                                '&:hover': {
+                                    backgroundColor: 'action.hover',
+                                },
+                            }}
+                            onClick={handleAccountClick}
+                        >
+                            <AccountCircleOutlinedIcon sx={{ fontSize: '35px' }} />
+                            <Typography variant="caption" sx={{ mt: 0.5 }}>
+                                My Account
+                            </Typography>
+                        </IconButton>
 
+                        {/* Logout */}
+                        <IconButton
+                            size="large"
+                            color="inherit"
+                            disableRipple
+                            sx={{
+                                color: 'text.secondary',
+                                flexDirection: 'column',
+                                borderRadius: 2,
+                                px: 2,
+                                py: 1,
+                                '&:hover': {
+                                    backgroundColor: 'action.hover',
+                                },
+                            }}
+                            onClick={handleLogout}
+                        >
+                            <LogoutOutlined sx={{ fontSize: '30px' }} />
+                            <Typography variant="caption" sx={{ mt: 0.5 }}>
+                                Logout
+                            </Typography>
+                        </IconButton>
+                    </Box>
 
-                        <Box>
-                            <IconButton
-                                disableRipple
-                                sx={{
-                                    boxShadow: 'none',
-                                    '&:hover': {
-                                        boxShadow: 'none',
-                                        backgroundColor: 'transparent',
-                                    },
-                                    '&:active': {
-                                        boxShadow: 'none',
-                                        backgroundColor: 'transparent',
-                                    },
-                                }}
-                                id="demo-positioned-button"
-                                aria-controls={open ? 'demo-positioned-menu' : undefined}
-                                aria-haspopup="true"
-                                aria-expanded={open ? 'true' : undefined}
-                                onClick={handleAccountClick}
-                            >
+                    {/* Tablet view - show only cart and account */}
+                    <Box
+                        sx={{ 
+                            display: { xs: 'none', sm: 'flex', md: 'none' },
+                            alignItems: 'center',
+                            gap: 1
+                        }}
+                    >
+                        <IconButton
+                            size="large"
+                            color="inherit"
+                            onClick={cartHandle}
+                            sx={{ color: 'text.secondary' }}
+                        >
+                            <Badge badgeContent={cartItems.length} color="error">
+                                <ShoppingCartOutlinedIcon sx={{ fontSize: '28px' }} />
+                            </Badge>
+                        </IconButton>
 
-
-                                <AccountCircleOutlinedIcon sx={{ fontSize: '35px' }} />
-
-
-
-                                <Typography variant="body1" color="text.secondary" ml={1}>
-                                    My Account
-                                </Typography>
-                            </IconButton>
-
-
-                            <IconButton size="large" color="grey"
-                                disableRipple
-                                sx={{
-                                    boxShadow: 'none',
-                                    '&:hover': {
-                                        boxShadow: 'none',
-                                        backgroundColor: 'transparent',
-                                    },
-                                    '&:active': {
-                                        boxShadow: 'none',
-                                        backgroundColor: 'transparent',
-                                    },
-                                }}
-                                onClick={handleLogout}
-                            >
-
-                                <LogoutOutlined
-                                    sx={{ fontSize: '30px' }}
-                                />
-
-                                <Typography variant="body1" color="text.secondary" ml={1}>
-                                    Logout
-                                </Typography>
-
-                            </IconButton>
-
-                        </Box>
-
+                        <IconButton
+                            size="large"
+                            color="inherit"
+                            onClick={handleAccountClick}
+                            sx={{ color: 'text.secondary' }}
+                        >
+                            <AccountCircleOutlinedIcon sx={{ fontSize: '32px' }} />
+                        </IconButton>
                     </Box>
                 </Toolbar>
             </AppBar>
+
+            {/* Mobile drawer */}
+            <Drawer
+                variant="temporary"
+                anchor="left"
+                open={mobileOpen}
+                onClose={toggleMobileMenu}
+                ModalProps={{
+                    keepMounted: true, // Better open performance on mobile
+                }}
+                sx={{
+                    display: { xs: 'block', md: 'none' },
+                    '& .MuiDrawer-paper': {
+                        boxSizing: 'border-box',
+                        width: 280,
+                    },
+                }}
+            >
+                {mobileMenu}
+            </Drawer>
+
+            {/* Account menu for tablet view */}
+            <Menu
+                anchorEl={accountMenuAnchor}
+                open={isAccountMenuOpen}
+                onClose={handleAccountMenuClose}
+                onClick={handleAccountMenuClose}
+                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+            >
+                <MenuItem onClick={handleDashboard}>
+                    <ListItemIcon>
+                        <AccountCircleOutlinedIcon fontSize="small" />
+                    </ListItemIcon>
+                    Dashboard
+                </MenuItem>
+                <MenuItem onClick={handleSellBook}>
+                    <ListItemIcon>
+                        <SellOutlined fontSize="small" />
+                    </ListItemIcon>
+                    Sell Book
+                </MenuItem>
+                <Divider />
+                <MenuItem onClick={handleLogout}>
+                    <ListItemIcon>
+                        <LogoutOutlined fontSize="small" />
+                    </ListItemIcon>
+                    Logout
+                </MenuItem>
+            </Menu>
         </Box>
     );
 };

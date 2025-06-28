@@ -87,14 +87,18 @@ const CartPage = () => {
   const handleClearCart = async () => {
     try {
       const token = localStorage.getItem('token');
-      await api.delete('api/cart', {
+      const res=await api.delete('api/cart', {
         headers: { Authorization: `Bearer ${token}` },
       });
+        console.log(res.data);
       dispatch(clearCart());
+      handleSuccess("Cart is Cleard Successful");
     } catch (err) {
       console.error('Failed to clear cart:', err);
     }
   };
+
+
 
  const handleCheckout = () => {
   const itemIds = cartItems.map(item => item._id);

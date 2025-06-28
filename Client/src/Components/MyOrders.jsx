@@ -41,13 +41,7 @@ const MyOrders = () => {
 
   return (
     <Box p={3}>
-      <Typography
-        variant="h4"
-        fontWeight={700}
-        color="text.secondary"
-        textAlign="center"
-        gutterBottom
-      >
+      <Typography variant="h4" component="h1" gutterBottom color="primary" textAlign='center'>
         My Orders
       </Typography>
 
@@ -109,7 +103,7 @@ const MyOrders = () => {
                           <HourglassEmpty color="warning" fontSize="small" />
                         )}
                         <Typography variant="body2" color="text.secondary">
-                          {order.isPaid ? 'Paid' : 'Payment to be pain in cod mode'}
+                          {order.isPaid ? 'Paid' : 'Payment to be paid in cod mode'}
                         </Typography>
                       </Stack>
                     </CardContent>

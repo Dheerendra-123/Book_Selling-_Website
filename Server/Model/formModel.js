@@ -60,10 +60,7 @@ const bookSchema = new mongoose.Schema({
       message: "At least one image is required",
     },
   },
-  isSold: {
-    type: Boolean,
-    default: false,
-  },
+
   sellerName: {
     type: String,
     required: true,
@@ -83,6 +80,10 @@ const bookSchema = new mongoose.Schema({
   pinCode: {
     type: Number,
     required: true,
+  },
+    isOrdered: {
+    type: Boolean,
+    default: false
   },
   created: {type: Date, default: Date.now}
 }, { timestamps: true });

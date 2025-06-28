@@ -26,10 +26,11 @@ import {
   Alert,
   Container
 } from '@mui/material';
-import { setCartItems } from '../../redux/cartSlice';
+import { clearCart, setCartItems } from '../../redux/cartSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { api } from '../api/api';
 import { handleError, handleSuccess } from '../Utils/Tostify';
+import { useNavigate } from 'react-router-dom';
 
 const Checkout = () => {
 
@@ -49,7 +50,7 @@ const Checkout = () => {
     cardholderName: '',     
     upiId: ''               
   });
-
+  const navigate=useNavigate();
   const steps = ['Address Details', 'Order Summary', 'Payment'];
   const orderListItems = useSelector((state) => state.cart.items);
   const dispatch = useDispatch();
@@ -124,7 +125,6 @@ const Checkout = () => {
         pincode: formData.pincode
       },
       paymentMethod: formData.paymentMethod,
-      isPaid: formData.paymentMethod !== 'cod',
       totalAmount: total
     };
 
@@ -136,22 +136,15 @@ const Checkout = () => {
       });
 
       handleSuccess('Order placed successfully! Thank you for your purchase.');
+      await api.delete('/api/cart', { headers: { Authorization: `Bearer ${token}` } });
+      dispatch(clearCart());
+      navigate('/dashboard/myOrders');
     } catch (error) {
       console.error('Payment failed:', error);
       handleError('Something went wrong while placing your order.');
     }
   }, [orderListItems, formData, total]);
 
-
-  const handlePlaceOrder = useCallback(() => {
-  if (formData.paymentMethod === 'cod') {
-    // Directly process payment with COD
-    handlePayment(false);
-  } else {
-    // Go to payment step for online methods
-    setActiveStep(2);
-  }
-}, [formData.paymentMethod, handlePayment]);
 
 
   // FIX 4: Move step components outside and make them stable
@@ -326,16 +319,6 @@ const Checkout = () => {
               onChange={handleInputChange}
             >
               <FormControlLabel
-                value="card"
-                control={<Radio />}
-                label="Credit/Debit Card"
-              />
-              <FormControlLabel
-                value="upi"
-                control={<Radio />}
-                label="UPI Payment"
-              />
-              <FormControlLabel
                 value="cod"
                 control={<Radio />}
                 label="Cash on Delivery"
@@ -493,7 +476,7 @@ const Checkout = () => {
           {activeStep === 1 ? (
             <Button
               variant="contained"
-              onClick={handlePlaceOrder}
+              onClick={handlePayment}
               size="large"
             >
               Place Order
@@ -501,7 +484,7 @@ const Checkout = () => {
           ) : activeStep === steps.length - 1 ? (
             <Button
               variant="contained"
-              onClick={()=>handlePayment(true)}
+              onClick={handlePayment}
               size="large"
               color="success"
             >

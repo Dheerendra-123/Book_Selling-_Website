@@ -55,6 +55,8 @@ export const formController = async (req, res) => {
 
     console.log("Book Form", newForm);
 
+  req.files.forEach(file => removeLocalFile(file.path));
+
     res.json({
       message: "Book Form Created Successfully",
       success: true,
@@ -62,10 +64,13 @@ export const formController = async (req, res) => {
     });
 
     // Cleanup local files
-    req.files.forEach(file => removeLocalFile(file.path));
+  
 
   } catch (error) {
     console.log(error);
+        if (req.files) {
+      req.files.forEach(file => removeLocalFile(file.path));
+    }
     res.json({ message: error.message, success: false, status: 400 });
   }
 };
