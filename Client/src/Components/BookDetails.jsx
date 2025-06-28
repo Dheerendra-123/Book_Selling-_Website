@@ -24,7 +24,9 @@ import {
   Star,
   MenuBook,
   ContactMail,
-  Place
+  Place,
+  Phone,
+  WhatsApp
 } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -537,6 +539,18 @@ const BookDetails = () => {
                   {bookData.email}
                 </Typography>
               </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Phone sx={{ mr: 2, color: 'text.secondary' }} />
+                <Typography variant="body1" color="text.primary">
+                  {bookData.contact}
+                </Typography>
+              </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <WhatsApp sx={{ mr: 2, color: 'text.secondary' }} />
+                <Typography variant="body1" color="text.primary">
+                  {bookData.whatsapp}
+                </Typography>
+              </Box>
             </Card>
           </Grid>
 
@@ -567,7 +581,7 @@ const BookDetails = () => {
                   <Typography variant="h7" color="text.primary" fontWeight={600}>
                     PIN Code
                   </Typography>
-                  <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
+                  <Typography variant="body1" color="text.secondary" >
                     {bookData.pinCode}
                   </Typography>
                 </Box>
@@ -576,7 +590,7 @@ const BookDetails = () => {
                   <Typography variant="h7" color="text.primary" fontWeight={600}>
                     City & State
                   </Typography>
-                  <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 600 }}>
+                  <Typography variant="body1" color="text.secondary">
                     {bookData.city}, {bookData.state}
                   </Typography>
                 </Box>

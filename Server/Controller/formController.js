@@ -18,6 +18,8 @@ export const formController = async (req, res) => {
     email,
     state,
     city,
+    whatsapp,
+    contact,
     pinCode,
   } = req.body;
 
@@ -48,6 +50,8 @@ export const formController = async (req, res) => {
       isSold,
       sellerName,
       email,
+      whatsapp,
+      contact,
       state,
       city,
       pinCode,

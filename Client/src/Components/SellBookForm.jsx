@@ -82,6 +82,8 @@ const SellBookForm = () => {
     sellerName: '',
     email: '',
     state: '',
+    contact: '',
+    whatsapp: '',
     city: '',
     pinCode: '',
   });
@@ -106,7 +108,7 @@ const SellBookForm = () => {
       ...prev,
       [name]: value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
@@ -117,62 +119,62 @@ const SellBookForm = () => {
   };
 
   const handleImageUpload = async (e) => {
-  const files = Array.from(e.target.files);
+    const files = Array.from(e.target.files);
 
-  // Check if adding new files would exceed the limit
-  if (images.length + files.length > MAX_IMAGES) {
-    setErrors(prev => ({
-      ...prev,
-      images: `You can only upload a maximum of ${MAX_IMAGES} images. Currently you have ${images.length} image(s).`
-    }));
-    return;
-  }
+    // Check if adding new files would exceed the limit
+    if (images.length + files.length > MAX_IMAGES) {
+      setErrors(prev => ({
+        ...prev,
+        images: `You can only upload a maximum of ${MAX_IMAGES} images. Currently you have ${images.length} image(s).`
+      }));
+      return;
+    }
 
-  // Clear any existing image errors
-  if (errors.images) {
-    setErrors(prev => ({
-      ...prev,
-      images: ''
-    }));
-  }
+    // Clear any existing image errors
+    if (errors.images) {
+      setErrors(prev => ({
+        ...prev,
+        images: ''
+      }));
+    }
 
-  for (const file of files) {
-    if (file.type.startsWith('image/')) {
-      try {
-        const options = {
-          maxSizeMB: 1, // Compress to under 1 MB
-          maxWidthOrHeight: 1024,
-          useWebWorker: true
-        };
+    for (const file of files) {
+      if (file.type.startsWith('image/')) {
+        try {
+          const options = {
+            maxSizeMB: 1, // Compress to under 1 MB
+            maxWidthOrHeight: 1024,
+            useWebWorker: true
+          };
 
-        const compressedFile = await imageCompression(file, options);
+          const compressedFile = await imageCompression(file, options);
 
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          setImages(prev => {
-            // Check again due to async behavior
-            if (prev.length >= MAX_IMAGES) {
-              return prev;
-            }
-            return [...prev, {
-              file: compressedFile,
-              preview: event.target.result,
-              id: Date.now() + Math.random()
-            }];
-          });
-        };
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            setImages(prev => {
+              // Check again due to async behavior
+              if (prev.length >= MAX_IMAGES) {
+                return prev;
+              }
+              return [...prev, {
+                file: compressedFile,
+                preview: event.target.result,
+                id: Date.now() + Math.random()
+              }];
+            });
+          };
 
-        reader.readAsDataURL(compressedFile);
-      } catch (error) {
-        console.error('Compression error:', error);
-        setErrors(prev => ({
-          ...prev,
-          images: 'Failed to compress image. Please try a different file.'
-        }));
+          reader.readAsDataURL(compressedFile);
+        } catch (error) {
+          console.error('Compression error:', error);
+          setErrors(prev => ({
+            ...prev,
+            images: 'Failed to compress image. Please try a different file.'
+          }));
+        }
       }
     }
-  }
-};
+  };
 
   const removeImage = (imageId) => {
     setImages(prev => prev.filter(img => img.id !== imageId));
@@ -200,6 +202,8 @@ const SellBookForm = () => {
     if (!formData.state.trim()) newErrors.state = 'State is required';
     if (!formData.city.trim()) newErrors.city = 'City is required';
     if (!formData.pinCode) newErrors.pinCode = 'PIN code is required';
+    if (!formData.contact) newErrors.pinCode = 'Contact is required';
+    if (!formData.whatsapp) newErrors.pinCode = 'WhatsApp no. is required';
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -246,7 +250,7 @@ const SellBookForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       setSubmitMessage('Please fix the errors above');
       return;
@@ -257,7 +261,7 @@ const SellBookForm = () => {
 
     try {
       const formDataToSend = new FormData();
-      
+
       // Append all form fields
       Object.keys(formData).forEach(key => {
         if (formData[key] !== '') {
@@ -282,10 +286,10 @@ const SellBookForm = () => {
       });
 
       // console.log(response.data);
-      const navigate=useNavigate();
+      const navigate = useNavigate();
       setSubmitMessage('Book listed successfully!');
       navigate('/books');
-      
+
       // Reset form
       setFormData({
         title: '',
@@ -301,6 +305,8 @@ const SellBookForm = () => {
         sellerName: '',
         email: '',
         state: '',
+        contact:'',
+        whatsapp:'',
         city: '',
         pinCode: '',
       });
@@ -309,13 +315,13 @@ const SellBookForm = () => {
 
     } catch (error) {
       console.error('Submit error:', error);
-      
+
       // More detailed error handling
       if (error.response) {
         // Server responded with error status
         const status = error.response.status;
         const message = error.response.data?.message || error.response.data?.error || 'Server error';
-        
+
         if (status === 401) {
           setSubmitMessage('Authentication failed. Please log in again.');
         } else if (status === 413) {
@@ -327,7 +333,7 @@ const SellBookForm = () => {
         }
       } else if (error.request) {
         setSubmitMessage('Network error. Please check your connection and try again.');
-      } else { 
+      } else {
         setSubmitMessage('Error submitting form. Please try again.');
       }
     } finally {
@@ -337,142 +343,148 @@ const SellBookForm = () => {
 
 
 
-return (
-  <Box sx={{ maxWidth: 900, mx: 'auto', p: { xs: 2, sm: 4 }, width: '100%' }}>
-    <Paper elevation={4} sx={{ p: { xs: 3, sm: 5 }, borderRadius: 4 }}>
-      <Typography variant="h4" align="center" gutterBottom color="primary">
-        Sell Your Book
-      </Typography>
-      <Typography variant="body1" align="center" color="text.secondary" gutterBottom>
-        Fill in the details below to list your book for sale
-      </Typography>
+  return (
+    <Box sx={{ maxWidth: 900, mx: 'auto', p: { xs: 2, sm: 4 }, width: '100%' }}>
+      <Paper elevation={4} sx={{ p: { xs: 3, sm: 5 }, borderRadius: 4 }}>
+        <Typography variant="h4" align="center" gutterBottom color="primary">
+          Sell Your Book
+        </Typography>
+        <Typography variant="body1" align="center" color="text.secondary" gutterBottom>
+          Fill in the details below to list your book for sale
+        </Typography>
 
-      <form onSubmit={handleSubmit}>
-        {/* Book Information Section */}
-        <Box sx={{ mt: 4, mb: 2 }}>
-          <Typography variant="h6" sx={{ color: 'primary.main' }}>Book Information</Typography>
-          <Divider sx={{ mt: 1 }} />
-        </Box>
+        <form onSubmit={handleSubmit}>
+          {/* Book Information Section */}
+          <Box sx={{ mt: 4, mb: 2 }}>
+            <Typography variant="h6" sx={{ color: 'primary.main' }}>Book Information</Typography>
+            <Divider sx={{ mt: 1 }} />
+          </Box>
 
-        <Grid container spacing={2}>
-          <Grid  size={{ xs: 12, md: 6,sm:6 }} >
-            <TextField fullWidth label="Book Title" name="title" value={formData.title} onChange={handleInputChange} error={!!errors.title} helperText={errors.title} required />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6,sm:6 }}>
-            <TextField fullWidth label="Author" name="author" value={formData.author} onChange={handleInputChange} error={!!errors.author} helperText={errors.author} required />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6,sm:6 }}>
-            <TextField fullWidth label="Edition" name="edition" value={formData.edition} onChange={handleInputChange} />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6,sm:6 }}>
-            <TextField fullWidth label="ISBN (Optional)" name="isbn" value={formData.isbn} onChange={handleInputChange} error={!!errors.isbn} helperText={errors.isbn || "10 or 13 digit ISBN number"} />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6,sm:6 }}>
-            <TextField fullWidth label="Category" name="category" value={formData.category} onChange={handleInputChange} error={!!errors.category} helperText={errors.category} required />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6,sm:6 }}>
-             <TextField fullWidth label="Type" name="type" value={formData.type} onChange={handleInputChange} error={!!errors.type} helperText={errors.type} required />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6,sm:6 }}>
-           <TextField fullWidth label="Condition" name="condition" value={formData.condition} onChange={handleInputChange} error={!!errors.condition} helperText={errors.condition} required />
-          </Grid>
-        </Grid>
-
-        {/* Pricing Section */}
-        <Box sx={{ mt: 4, mb: 2 }}>
-          <Typography variant="h6" sx={{ color: 'primary.main' }}>Pricing</Typography>
-          <Divider sx={{ mt: 1 }} />
-        </Box>
-
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, md: 6,sm:6 }} >
-            <TextField fullWidth label="Selling Price" name="price" type="number" value={formData.price} onChange={handleInputChange} error={!!errors.price} helperText={errors.price} required InputProps={{ startAdornment: <InputAdornment position="start"><CurrencyRupeeIcon /></InputAdornment> }} />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6,sm:6 }} >
-            <TextField fullWidth label="Original Price (Optional)" name="originalPrice" type="number" value={formData.originalPrice} onChange={handleInputChange} error={!!errors.originalPrice} helperText={errors.originalPrice} InputProps={{ startAdornment: <InputAdornment position="start"><CurrencyRupeeIcon /></InputAdornment> }} />
-          </Grid>
-        </Grid>
-
-        {/* Description */}
-        <Grid container spacing={2} sx={{ mt: 2 }}>
-          <Grid size={{ xs: 12, md: 12,sm:12 }}  >
-            <TextField fullWidth label="Description (Optional)" name="description" multiline rows={4} value={formData.description} onChange={handleInputChange} error={!!errors.description} helperText={errors.description || `${formData.description.length}/500 characters`} />
-          </Grid>
-        </Grid>
-
-        {/* Images Section */}
-        <Box sx={{ mt: 4, mb: 2 }}>
-          <Typography variant="h6" sx={{ color: 'primary.main' }}>Book Images</Typography>
-          <Divider sx={{ mt: 1 }} />
-        </Box>
-
-        <Box sx={{ mb: 3 }}>
-          <Button component="label" variant="outlined" startIcon={<PhotoCamera />} disabled={images.length >= MAX_IMAGES} sx={{ mb: 1 }}>
-            {images.length >= MAX_IMAGES ? `Maximum ${MAX_IMAGES} images reached` : 'Upload Images'}
-            <VisuallyHiddenInput type="file" multiple accept="image/*" onChange={handleImageUpload} disabled={images.length >= MAX_IMAGES} />
-          </Button>
-          <Typography variant="body2" color="text.secondary">
-            {images.length}/{MAX_IMAGES} images uploaded
-          </Typography>
-          {errors.images && <Typography color="error" variant="body2">{errors.images}</Typography>}
-        </Box>
-
-        {images.length > 0 && (
           <Grid container spacing={2}>
-            {images.map((image) => (
-              <Grid item key={image.id}>
-                <ImagePreview>
-                  <img src={image.preview} alt="Preview" />
-                  <DeleteButton size="small" onClick={() => removeImage(image.id)}>
-                    <DeleteIcon fontSize="small" />
-                  </DeleteButton>
-                </ImagePreview>
-              </Grid>
-            ))}
+            <Grid size={{ xs: 12, md: 6, sm: 6 }} >
+              <TextField fullWidth label="Book Title" name="title" value={formData.title} onChange={handleInputChange} error={!!errors.title} helperText={errors.title} required />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6, sm: 6 }}>
+              <TextField fullWidth label="Author" name="author" value={formData.author} onChange={handleInputChange} error={!!errors.author} helperText={errors.author} required />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6, sm: 6 }}>
+              <TextField fullWidth label="Edition" name="edition" value={formData.edition} onChange={handleInputChange} />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6, sm: 6 }}>
+              <TextField fullWidth label="ISBN (Optional)" name="isbn" value={formData.isbn} onChange={handleInputChange} error={!!errors.isbn} helperText={errors.isbn || "10 or 13 digit ISBN number"} />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6, sm: 6 }}>
+              <TextField fullWidth label="Category" name="category" value={formData.category} onChange={handleInputChange} error={!!errors.category} helperText={errors.category} required />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6, sm: 6 }}>
+              <TextField fullWidth label="Type" name="type" value={formData.type} onChange={handleInputChange} error={!!errors.type} helperText={errors.type} required />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6, sm: 6 }}>
+              <TextField fullWidth label="Condition" name="condition" value={formData.condition} onChange={handleInputChange} error={!!errors.condition} helperText={errors.condition} required />
+            </Grid>
           </Grid>
-        )}
 
-        {/* Seller Info */}
-        <Box sx={{ mt: 4, mb: 2 }}>
-          <Typography variant="h6" sx={{ color: 'primary.main' }}>Seller Information</Typography>
-          <Divider sx={{ mt: 1 }} />
-        </Box>
+          {/* Pricing Section */}
+          <Box sx={{ mt: 4, mb: 2 }}>
+            <Typography variant="h6" sx={{ color: 'primary.main' }}>Pricing</Typography>
+            <Divider sx={{ mt: 1 }} />
+          </Box>
 
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12, md: 6,sm:6 }}>
-            <TextField fullWidth label="Your Name" name="sellerName" value={formData.sellerName} onChange={handleInputChange} error={!!errors.sellerName} helperText={errors.sellerName} required />
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, md: 6, sm: 6 }} >
+              <TextField fullWidth label="Selling Price" name="price" type="number" value={formData.price} onChange={handleInputChange} error={!!errors.price} helperText={errors.price} required InputProps={{ startAdornment: <InputAdornment position="start"><CurrencyRupeeIcon /></InputAdornment> }} />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6, sm: 6 }} >
+              <TextField fullWidth label="Original Price (Optional)" name="originalPrice" type="number" value={formData.originalPrice} onChange={handleInputChange} error={!!errors.originalPrice} helperText={errors.originalPrice} InputProps={{ startAdornment: <InputAdornment position="start"><CurrencyRupeeIcon /></InputAdornment> }} />
+            </Grid>
           </Grid>
-          <Grid size={{ xs: 12, md: 6,sm:6 }}>
-            <TextField fullWidth label="Email" name="email" type="email" value={formData.email} onChange={handleInputChange} error={!!errors.email} helperText={errors.email} required />
-          </Grid>
-          <Grid size={{ xs: 12, md: 4,sm:4 }}>
-            <TextField fullWidth label="State" name="state" value={formData.state} onChange={handleInputChange} error={!!errors.state} helperText={errors.state} required />
-          </Grid>
-          <Grid size={{ xs: 12, md: 4,sm:4 }}>
-            <TextField fullWidth label="City" name="city" value={formData.city} onChange={handleInputChange} error={!!errors.city} helperText={errors.city} required />
-          </Grid>
-          <Grid size={{ xs: 12, md: 4,sm:4 }}>
-            <TextField fullWidth label="PIN Code" name="pinCode" value={formData.pinCode} onChange={handleInputChange} error={!!errors.pinCode} helperText={errors.pinCode} required />
-          </Grid>
-        </Grid>
 
-        {/* Submit Section */}
-        <Box sx={{ mt: 4, textAlign: 'center' }}>
-          {submitMessage && (
-            <Snackbar open={open} onClose={handleClose} autoHideDuration={2000} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
-            <Alert severity={submitMessage.includes('successfully') ? 'success' : 'error'} sx={{ mb: 2 }} variant='outlined'>
-              {submitMessage}
-            </Alert>
-            </Snackbar>
+          {/* Description */}
+          <Grid container spacing={2} sx={{ mt: 2 }}>
+            <Grid size={{ xs: 12, md: 12, sm: 12 }}  >
+              <TextField fullWidth label="Description (Optional)" name="description" multiline rows={4} value={formData.description} onChange={handleInputChange} error={!!errors.description} helperText={errors.description || `${formData.description.length}/500 characters`} />
+            </Grid>
+          </Grid>
+
+          {/* Images Section */}
+          <Box sx={{ mt: 4, mb: 2 }}>
+            <Typography variant="h6" sx={{ color: 'primary.main' }}>Book Images</Typography>
+            <Divider sx={{ mt: 1 }} />
+          </Box>
+
+          <Box sx={{ mb: 3 }}>
+            <Button component="label" variant="outlined" startIcon={<PhotoCamera />} disabled={images.length >= MAX_IMAGES} sx={{ mb: 1 }}>
+              {images.length >= MAX_IMAGES ? `Maximum ${MAX_IMAGES} images reached` : 'Upload Images'}
+              <VisuallyHiddenInput type="file" multiple accept="image/*" onChange={handleImageUpload} disabled={images.length >= MAX_IMAGES} />
+            </Button>
+            <Typography variant="body2" color="text.secondary">
+              {images.length}/{MAX_IMAGES} images uploaded
+            </Typography>
+            {errors.images && <Typography color="error" variant="body2">{errors.images}</Typography>}
+          </Box>
+
+          {images.length > 0 && (
+            <Grid container spacing={2}>
+              {images.map((image) => (
+                <Grid item key={image.id}>
+                  <ImagePreview>
+                    <img src={image.preview} alt="Preview" />
+                    <DeleteButton size="small" onClick={() => removeImage(image.id)}>
+                      <DeleteIcon fontSize="small" />
+                    </DeleteButton>
+                  </ImagePreview>
+                </Grid>
+              ))}
+            </Grid>
           )}
-          <Button type="submit" variant="contained" size="large" disabled={loading} sx={{ minWidth: 200 }}>
-            {loading ? <CircularProgress size={24} /> : 'List Book for Sale'}
-          </Button>
-        </Box>
-      </form>
-    </Paper>
-  </Box>
-);
+
+          {/* Seller Info */}
+          <Box sx={{ mt: 4, mb: 2 }}>
+            <Typography variant="h6" sx={{ color: 'primary.main' }}>Seller Information</Typography>
+            <Divider sx={{ mt: 1 }} />
+          </Box>
+
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, md: 6, sm: 6 }}>
+              <TextField fullWidth label="Your Name" name="sellerName" value={formData.sellerName} onChange={handleInputChange} error={!!errors.sellerName} helperText={errors.sellerName} required />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6, sm: 6 }}>
+              <TextField fullWidth label="Email" name="email" type="email" value={formData.email} onChange={handleInputChange} error={!!errors.email} helperText={errors.email} required />
+            </Grid>
+             <Grid size={{ xs: 12, md: 6, sm: 6 }}>
+              <TextField fullWidth label="Contact Numer" name="contact" value={formData.contact} onChange={handleInputChange}  required />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6, sm: 6 }}>
+              <TextField fullWidth label="WhatsApp Number" name="whatsapp" type="email" value={formData.whatsapp} onChange={handleInputChange}  required />
+            </Grid>
+            <Grid size={{ xs: 12, md: 4, sm: 4 }}>
+              <TextField fullWidth label="State" name="state" value={formData.state} onChange={handleInputChange} error={!!errors.state} helperText={errors.state} required />
+            </Grid>
+            <Grid size={{ xs: 12, md: 4, sm: 4 }}>
+              <TextField fullWidth label="City" name="city" value={formData.city} onChange={handleInputChange} error={!!errors.city} helperText={errors.city} required />
+            </Grid>
+            <Grid size={{ xs: 12, md: 4, sm: 4 }}>
+              <TextField fullWidth label="PIN Code" name="pinCode" value={formData.pinCode} onChange={handleInputChange} error={!!errors.pinCode} helperText={errors.pinCode} required />
+            </Grid>
+          </Grid>
+
+          {/* Submit Section */}
+          <Box sx={{ mt: 4, textAlign: 'center' }}>
+            {submitMessage && (
+              <Snackbar open={open} onClose={handleClose} autoHideDuration={2000} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
+                <Alert severity={submitMessage.includes('successfully') ? 'success' : 'error'} sx={{ mb: 2 }} variant='outlined'>
+                  {submitMessage}
+                </Alert>
+              </Snackbar>
+            )}
+            <Button type="submit" variant="contained" size="large" disabled={loading} sx={{ minWidth: 200 }}>
+              {loading ? <CircularProgress size={24} /> : 'List Book for Sale'}
+            </Button>
+          </Box>
+        </form>
+      </Paper>
+    </Box>
+  );
 
 
 

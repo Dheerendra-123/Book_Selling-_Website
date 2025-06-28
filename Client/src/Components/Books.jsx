@@ -350,7 +350,7 @@ const Books = () => {
                     <CardActions>
                  
                       <Button size={isMobile?'large':'medium'} variant='outlined' onClick={() => previewHandle(book._id)} fullWidth>Preview</Button>
-                      <Button size={isMobile?'large':'medium'}   variant='outlined' onClick={() => detailsHandle(book._id)} fullWidth>View Details</Button>
+                      <Button size={isMobile?'large':'medium'}   variant='outlined' onClick={() => detailsHandle(book._id)} fullWidth>In Detail</Button>
                    
                     </CardActions>
                   </Card>
