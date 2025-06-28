@@ -21,6 +21,7 @@ export const formController = async (req, res) => {
     whatsapp,
     contact,
     pinCode,
+   
   } = req.body;
 
   try {
@@ -54,6 +55,7 @@ export const formController = async (req, res) => {
       contact,
       state,
       city,
+      userId: req.user._id,
       pinCode,
     });
 

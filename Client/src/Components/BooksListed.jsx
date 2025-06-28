@@ -25,12 +25,13 @@ const BooksListed = () => {
   const getAllBooks = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/api/books', {
+      const response = await api.get('/api/books/listed', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      setBookData(response.data.getAllBooks);
+      setBookData(response.data.books);
+
     } catch (error) {
       console.error('Failed to fetch books:', error);
     } finally {
@@ -40,6 +41,7 @@ const BooksListed = () => {
 
   useEffect(() => {
     getAllBooks();
+    
   }, []);
 
   return (
@@ -62,13 +64,13 @@ const BooksListed = () => {
       ) : bookData.length === 0 ? (
         <Box textAlign="center" mt={5}>
           <Typography variant="h6" color="text.secondary">
-            No books listed yet.
+            No books listed yet by You.
           </Typography>
         </Box>
       ) : (
         <Grid container spacing={2} pt={3} justifyContent={isMobile ? 'center' : false}>
           {bookData.map((book, index) => (
-            <Grid item xs={12} sm={5} md={2.5} key={index}>
+            <Grid size={{xs:12,sm:5,md:2.5}} key={index}>
               <Card>
                 <CardMedia
                   component="img"

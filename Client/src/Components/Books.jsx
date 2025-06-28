@@ -283,7 +283,7 @@ const Books = () => {
           ) : (
             <Grid container spacing={2} pt={1} justifyContent={isMobile?'center':false}>
               {filteredBooks.map((book, index) => (
-                <Grid size={{ xs: 11, sm: 6, md: 2.7 }} key={index}>
+                <Grid size={{ xs: 11, sm: 6, md: 2.3 }} key={index}>
                   <Box sx={{position:'relative',top:'40px',left:'7px'}}>
                     <Chip 
                       label={book.isOrdered?"Not Available":"Available"} 
@@ -296,14 +296,14 @@ const Books = () => {
                   <Card>
                     <CardMedia
                       component="img"
-                      height="140"
+                      height="160"
                       image={book.images && book.images.length > 0 ? book.images[0] : ''}
                       alt={book.title}
                     />
 
                     <CardContent>
                       <Typography variant="h6">
-                        {book.title.length > 14 ? `${book.title.slice(0, 24)}...` : book.title}
+                        {book.title.length > 14 ? `${book.title.slice(0, 20)}...` : book.title}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
                         Author: {book.author}

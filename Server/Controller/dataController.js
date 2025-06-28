@@ -29,3 +29,14 @@ export const getBookDetailById=async(req,res)=>{
     }
 }
 
+
+export const getBooksByUser = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const books = await formModel.find({ userId });
+    res.json({ books });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
