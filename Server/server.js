@@ -23,20 +23,23 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
+const ConnectDB = async () => {
+  try {
+    await mongoose.connect(process.env.Mango_URI, {
+      dbName: 'chatApplication'
+    });
+    console.log("✅ MongoDB Connected Successfully");
 
-const ConnectDB=async()=>{
-    try{
-    await mongoose.connect(process.env.Mango_URI,{
-        dbName:'chatApplication'
-    })
-    console.log("MongoDB Connected Sucessfully");
-    }catch(error){
-        console.log(error);
-    }
-}
+    app.listen(PORT, () => {
+      console.log(`🚀 Server is listening on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('❌ MongoDB connection failed:', error.message);
+    process.exit(1); 
+  }
+};
 
 ConnectDB();
-
 app.get('/',(req,res)=>{
     res.json({message:"This is deafu;t route",sucess:true});
 });
