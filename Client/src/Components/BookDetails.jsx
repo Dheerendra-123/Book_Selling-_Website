@@ -129,18 +129,19 @@ const BookDetails = () => {
     getBook();
   }, []);
 
-  if (loading) {
-    return (
-      <Container maxWidth="md" sx={{ alignItems:'center',justifyContent:'center',display:'flex'}}>
-        <CircularProgress/>
-      </Container>
-    );
-  }
+
 
   const discountPercentage = bookData.originalPrice
     ? Math.round(((bookData.originalPrice - bookData.price) / bookData.originalPrice) * 100)
     : 0;
 
+    if (loading) {
+    return (
+      <Container maxWidth="md" sx={{height:'100vh', alignItems:'center',justifyContent:'center',display:'flex'}}>
+        <CircularProgress/>
+      </Container>
+    );
+  }
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       {/* Main Book Information Card */}
