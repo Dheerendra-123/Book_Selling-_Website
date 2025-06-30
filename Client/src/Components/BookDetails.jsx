@@ -131,7 +131,7 @@ const BookDetails = () => {
 
   if (loading) {
     return (
-      <Container maxWidth="lg" sx={{ alignItems:'center',justifyContent:'center'}}>
+      <Container maxWidth="md" sx={{ alignItems:'center',justifyContent:'center',display:'flex'}}>
         <CircularProgress/>
       </Container>
     );
