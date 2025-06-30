@@ -11,7 +11,8 @@ import {
   IconButton,
   Tooltip,
   Container,
-  Badge
+  Badge,
+  CircularProgress
 } from '@mui/material';
 import {
   Person,
@@ -130,8 +131,8 @@ const BookDetails = () => {
 
   if (loading) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Typography>Loading...</Typography>
+      <Container maxWidth="lg" sx={{ alignItems:'center',justifyContent:'center'}}>
+        <CircularProgress/>
       </Container>
     );
   }
