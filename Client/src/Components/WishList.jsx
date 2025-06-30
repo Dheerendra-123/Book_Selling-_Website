@@ -126,8 +126,8 @@ const WishList = () => {
 
                   <CardContent>
                     <Typography variant="h6">
-                      {book.title.length > 27
-                        ? `${book.title.slice(0, 24)}...`
+                      {book.title.length > 23
+                        ? `${book.title.slice(0, 23)}...`
                         : book.title}
                     </Typography>
 
