@@ -12,13 +12,24 @@ import {
   Stack,
   Typography,
   CircularProgress,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
 } from '@mui/material';
 
 import DiscountIcon from '@mui/icons-material/Discount';
+import { Delete } from '@mui/icons-material';
+import { handleError, handleSuccess } from '../Utils/Tostify';
 
 const BooksListed = () => {
   const [bookData, setBookData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedBookId, setSelectedBookId] = useState(null);
 
   const isMobile = useMobile();
 
@@ -41,8 +52,45 @@ const BooksListed = () => {
 
   useEffect(() => {
     getAllBooks();
-    
+
   }, []);
+
+
+
+  const confirmDelete = (bookId) => {
+    setSelectedBookId(bookId);
+    setOpenDialog(true);
+  };
+
+  const cancelDelete = () => {
+    setOpenDialog(false);
+    setSelectedBookId(null);
+  };
+
+  const proceedToDelete = async () => {
+    setOpenDialog(false);
+    if (!selectedBookId) return;
+
+    try {
+      const res = await api.delete('/api/bookslisted/remove', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        data: { bookId: selectedBookId },
+      });
+
+      if (res.data.success) {
+        handleSuccess(res.data.message);
+        setBookData((prevBooks) =>
+          prevBooks.filter((book) => book._id !== selectedBookId)
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      handleError(error);
+    } finally {
+      setSelectedBookId(null);
+    }
+  };
+
 
   return (
     <Box p={3}>
@@ -69,8 +117,25 @@ const BooksListed = () => {
         </Box>
       ) : (
         <Grid container spacing={2} pt={3} justifyContent={isMobile ? 'center' : false}>
+
           {bookData.map((book, index) => (
-            <Grid size={{xs:12,sm:5,md:2.5}} key={index}>
+            <Grid size={{ xs: 12, sm: 5, md: 2.5 }} key={index}>
+              <IconButton
+                 onClick={() => confirmDelete(book._id)}
+                sx={{
+                  position: 'relative',
+                  top: 45,
+                  left: 5,
+                  zIndex: 1,
+                  backgroundColor: 'white',
+                  boxShadow: 1,
+                  '&:hover': {
+                    backgroundColor: 'grey.100',
+                  },
+                }}
+              >
+                <Delete color="error" />
+              </IconButton>
               <Card>
                 <CardMedia
                   component="img"
@@ -90,7 +155,9 @@ const BooksListed = () => {
                       : book.title}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Author: {book.author}
+                    Author:   {book.author.length > 17
+                      ? `${book.author.slice(0, 17)}...`
+                      : book.author}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Edition: {book.edition}
@@ -138,6 +205,27 @@ const BooksListed = () => {
           ))}
         </Grid>
       )}
+           <Dialog
+        open={openDialog}
+        onClose={cancelDelete}
+        aria-labelledby="confirm-delete-title"
+        aria-describedby="confirm-delete-description"
+      >
+        <DialogTitle id="confirm-delete-title">Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="confirm-delete-description">
+            Are you sure you want to delete this book from your listing? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={cancelDelete} color="success" variant='outlined'  autoFocus>
+            Cancel
+          </Button>
+          <Button onClick={proceedToDelete} color="error" variant="outlined" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

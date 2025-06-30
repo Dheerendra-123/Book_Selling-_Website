@@ -6,7 +6,6 @@ import {
   CardContent,
   CardMedia,
   Chip,
-  Container,
   Grid,
   IconButton,
   Stack,
@@ -19,13 +18,14 @@ import DiscountIcon from '@mui/icons-material/Discount';
 import { removeFromWishList, setWishList } from '../../redux/wishListSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import useMobile from '../../hooks/useMobile';
+import { useNavigate } from 'react-router-dom';
 
 const WishList = () => {
   const wishList = useSelector((state) => state.wishlist.items);
   const dispatch = useDispatch();
   const isMobile = useMobile();
   const token = localStorage.getItem('token');
-
+  const navigate=useNavigate();
   const [loading, setLoading] = useState(true);
 
   const getWishList = async () => {
@@ -63,6 +63,10 @@ const WishList = () => {
     }
   };
 
+  const handlego=(bookID)=>{
+    navigate(`/view-details/${bookID}`);
+  }
+
   return (
     <Box p={3}>
       <Typography
@@ -89,7 +93,7 @@ const WishList = () => {
       ) : (
         <Grid container spacing={2} mt={5} justifyContent={isMobile ? 'center' : false}>
           {wishList.map((book, index) => (
-            <Grid size={{ xs: 12, sm: 4, md: 3, lg: 3 }} key={index}>
+            <Grid size={{ xs: 12, sm: 4, md: 3, lg: 3 }} key={index} sx={{cursor:'pointer',transition: 'transform 0.2s, box-shadow 0.2s','&:hover': {transform: 'scale(1.01)',boxShadow: 3,zIndex: 2}}} onClick={()=>handlego(book._id)}>
               <Box position="relative">
                 <IconButton
                   onClick={() => handleDelete(book._id)}

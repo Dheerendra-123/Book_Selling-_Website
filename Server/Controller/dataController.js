@@ -40,3 +40,32 @@ export const getBooksByUser = async (req, res) => {
   }
 };
 
+
+export const removeBookListed = async (req, res) => {
+  try {
+    const { bookId } = req.body;
+
+    if (!bookId) {
+      return res.status(400).json({ success: false, message: "No bookId provided" });
+    }
+
+    const result = await formModel.deleteOne({
+      _id: bookId,
+      userId: req.user.id, // ensure only the creator can delete
+    });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ success: false, message: "Book not found or already removed" });
+    }
+
+    console.log(`✅ Book with ID ${bookId} deleted by user ${req.user.id}`);
+    res.json({ success: true, message: "Removed book from booklisted" });
+
+  } catch (error) {
+    console.error("❌ Error in removeBookListed:", error.message);
+    res.status(500).json({ success: false, message: "Server error while removing book" });
+  }
+};
+
+
+
