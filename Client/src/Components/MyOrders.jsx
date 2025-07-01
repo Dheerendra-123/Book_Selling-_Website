@@ -59,7 +59,7 @@ const MyOrders = () => {
             order.items.map((item) => {
               const product = item.product || {};
               return (
-                <Grid size={{ xs: 12, sm: 4, md: 3, lg: 3 }} key={item._id}>
+                <Grid item xs={12} sm={4} md={3} lg={3}  key={item._id}>
                   <Card sx={{ height: '100%' }}>
                     <CardMedia
                       component="img"

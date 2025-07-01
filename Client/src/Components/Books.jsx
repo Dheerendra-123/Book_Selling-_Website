@@ -244,7 +244,7 @@ const Books = () => {
         <Box mt={2}>
             <Grid container spacing={2} pt={1} justifyContent={isMobile ? 'center' : false}>
               {filteredBooks.map((book, index) => (
-                <Grid size={{xs:12,sm:6,md:2.3}} key={index}>
+                <Grid  item xs={12} sm={4} md={3} key={index}>
                   <Box sx={{ position: 'relative', top: '40px', left: '7px' }}>
                     <Chip
                       label={book.isOrdered ? "Not Available" : "Available"}
@@ -292,7 +292,7 @@ const Books = () => {
                     </CardContent>
                     <CardActions>
                       <Button size={isMobile ? 'large' : 'medium'} variant='outlined' onClick={() => previewHandle(book._id)} fullWidth>Preview</Button>
-                      <Button size={isMobile ? 'large' : 'medium'} variant='outlined' onClick={() => detailsHandle(book._id)} fullWidth>In Detail</Button>
+                      <Button size={isMobile ? 'large' : 'medium'} variant='outlined' onClick={() => detailsHandle(book._id)} fullWidth>Detail</Button>
                     </CardActions>
                   </Card>
                 </Grid>

@@ -93,7 +93,7 @@ const WishList = () => {
       ) : (
         <Grid container spacing={2} mt={5} justifyContent={isMobile ? 'center' : false}>
           {wishList.map((book, index) => (
-            <Grid size={{ xs: 12, sm: 4, md: 3, lg: 3 }} key={index} sx={{cursor:'pointer',transition: 'transform 0.2s, box-shadow 0.2s','&:hover': {transform: 'scale(1.01)',boxShadow: 3,zIndex: 2}}} onClick={()=>handlego(book._id)}>
+            <Grid item xs={12} sm={4} md={3} lg={3} key={index} sx={{cursor:'pointer',transition: 'transform 0.2s, box-shadow 0.2s','&:hover': {transform: 'scale(1.01)',boxShadow: 3,zIndex: 2}}} onClick={()=>handlego(book._id)}>
               <Box position="relative">
                 <IconButton
                   onClick={() => handleDelete(book._id)}
@@ -126,8 +126,8 @@ const WishList = () => {
 
                   <CardContent>
                     <Typography variant="h6">
-                      {book.title.length > 23
-                        ? `${book.title.slice(0, 23)}...`
+                      {book.title.length > 21
+                        ? `${book.title.slice(0, 21)}...`
                         : book.title}
                     </Typography>
 

@@ -13,21 +13,20 @@ import {
   Paper,
   Stack,
   Chip,
-  Badge,
-  Alert,
-  AlertTitle,
   Skeleton,
-  Fade
+  Fade,
+  Alert,
+  Tooltip
 } from '@mui/material';
 import {
   Delete,
   ShoppingCartCheckout,
   LocalShipping,
-  Security,
   Verified,
   ShoppingBag,
   ArrowBack,
-  CreditCard
+  Clear,
+  InfoOutlined
 } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -41,7 +40,7 @@ const CartPage = () => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items);
   const [loading, setLoading] = useState(true);
-  const [discount, setDiscount] = useState(0);
+  const [removingItems, setRemovingItems] = useState(new Set());
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -64,68 +63,75 @@ const CartPage = () => {
 
   const subtotal = cartItems.reduce((total, item) => total + item.price, 0);
   const shipping = subtotal > 500 ? 0 : 50;
-  const discountAmount = (subtotal * discount) / 100;
-  const total = subtotal + shipping - discountAmount;
+  const total = subtotal + shipping;
 
   const handleRemoveItem = async (itemId) => {
+    setRemovingItems(prev => new Set(prev).add(itemId));
     try {
-
       const token = localStorage.getItem('token');
-      const res=await api.delete(`api/cart/${itemId}`, {
+      const res = await api.delete(`api/cart/${itemId}`, {
         headers: { Authorization: `Bearer ${token}` },
-        data: { productId:itemId }
+        data: { productId: itemId }
       });
       dispatch(removeFromCart(itemId));
-      handleSuccess(res.data.message)
-      console.log(res.data)
+      handleSuccess('Item removed from cart');
     } catch (err) {
-      handleError(res.data.errormessage);
+      handleError(err?.response?.data?.message || 'Error removing item');
       console.error('Failed to remove item from cart:', err);
+    } finally {
+      setRemovingItems(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(itemId);
+        return newSet;
+      });
     }
   };
 
   const handleClearCart = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res=await api.delete('api/cart', {
+      const res = await api.delete('api/cart', {
         headers: { Authorization: `Bearer ${token}` },
       });
-        console.log(res.data);
       dispatch(clearCart());
-      handleSuccess("Cart is Cleard Successful");
+      handleSuccess("Cart cleared successfully");
     } catch (err) {
+      handleError('Failed to clear cart');
       console.error('Failed to clear cart:', err);
     }
   };
 
-
-
- const handleCheckout = () => {
-  const itemIds = cartItems.map(item => item._id);
-  console.log("Proceeding to checkout with item IDs:", itemIds);
-  navigate('/checkout');
-};
+  const handleCheckout = () => {
+    const itemIds = cartItems.map(item => item._id);
+    console.log("Proceeding to checkout with item IDs:", itemIds);
+    navigate('/checkout');
+  };
 
   if (loading) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Grid container spacing={4}>
-          <Grid size={{xs:12, md:8}} >
+      <Container maxWidth="lg" sx={{ py: { xs: 2, md: 4 } }}>
+        <Box sx={{ mb: 4 }}>
+          <Skeleton variant="text" width={200} height={40} />
+          <Skeleton variant="text" width={300} height={24} sx={{ mt: 1 }} />
+        </Box>
+        <Grid container spacing={3}>
+          <Grid item xs={12} lg={8}>
             {[1, 2, 3].map((item) => (
-              <Card key={item} sx={{ mb: 3, p: 2 }}>
-                <Stack direction="row" spacing={3}>
-                  <Skeleton variant="rectangular" width={100} height={120} />
+              <Card key={item} sx={{ mb: 2, p: 2 }}>
+                <Stack direction="row" spacing={2}>
+                  <Skeleton variant="rectangular" width={80} height={100} />
                   <Box sx={{ flex: 1 }}>
-                    <Skeleton variant="text" width="60%" height={32} />
-                    <Skeleton variant="text" width="40%" height={24} />
-                    <Skeleton variant="text" width="30%" height={24} />
+                    <Skeleton variant="text" width="60%" height={24} />
+                    <Skeleton variant="text" width="40%" height={20} />
+                    <Skeleton variant="text" width="30%" height={20} />
                   </Box>
+                  <Skeleton variant="text" width={80} height={24} />
                 </Stack>
               </Card>
             ))}
           </Grid>
-          <Grid  size={{xs:12, md:4}} >
-            <Skeleton variant="rectangular" height={300} />
+          <Grid item xs={12} lg={4}>
+            <Skeleton variant="rectangular" height={250} />
           </Grid>
         </Grid>
       </Container>
@@ -134,155 +140,319 @@ const CartPage = () => {
 
   if (cartItems.length === 0) {
     return (
-      <Container maxWidth="md" sx={{ py: 8, textAlign: 'center' }}>
-        <Paper elevation={0} sx={{ p: 6, borderRadius: 4, background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)', border: '1px solid', borderColor: 'divider' }}>
-          <ShoppingBag sx={{ fontSize: 80, color: 'text.secondary', mb: 3 }} />
-          <Typography variant="h4" sx={{ fontWeight: 700, mb: 2, color: 'text.primary' }}>
-            Your Cart is Empty
+      <Container maxWidth="md" sx={{ py: { xs: 4, md: 8 } }}>
+        <Box sx={{ textAlign: 'center' }}>
+          <ShoppingBag 
+            sx={{ 
+              fontSize: { xs: 60, md: 80 }, 
+              color: 'text.disabled', 
+              mb: 2 
+            }} 
+          />
+          <Typography 
+            variant="h4" 
+            sx={{ 
+              fontWeight: 600, 
+              mb: 1, 
+              fontSize: { xs: '1.5rem', md: '2rem' } 
+            }}
+          >
+            Your cart is empty
           </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 4, fontSize: '1.1rem' }}>
-            Looks like you haven't added any books to your cart yet.
+          <Typography 
+            variant="body1" 
+            color="text.secondary" 
+            sx={{ mb: 4, maxWidth: 400, mx: 'auto' }}
+          >
+            Discover amazing books and add them to your cart to get started.
           </Typography>
-          <Button variant="contained" size="large" startIcon={<ArrowBack />} onClick={() => navigate('/books')} sx={{ px: 4, py: 1.5, borderRadius: 3, textTransform: 'none', fontWeight: 600, fontSize: '1rem' }}>
-            Continue Shopping
+          <Button 
+            variant="contained" 
+            size="large"
+            startIcon={<ArrowBack />}
+            onClick={() => navigate('/books')}
+            sx={{ 
+              px: 4, 
+              py: 1.5, 
+              textTransform: 'none', 
+              fontWeight: 500,
+              borderRadius: 2
+            }}
+          >
+            Browse Books
           </Button>
-        </Paper>
+        </Box>
       </Container>
     );
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: { xs: 2, md: 4 } }}>
+      {/* Header */}
       <Box sx={{ mb: 4 }}>
-        <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
-          <IconButton onClick={() => navigate(-1)} size="large">
-            <ArrowBack />
-          </IconButton>
-          <Typography variant="h4" sx={{ fontWeight: 700, color: 'text.primary' }}>
-            Shopping Cart
-          </Typography>
-          <Badge badgeContent={cartItems.length} color="primary">
-            <ShoppingBag />
-          </Badge>
-           
-        </Stack>
-        <Typography variant="body1" color="text.secondary">
-          {cartItems.length} item{cartItems.length !== 1 ? 's' : ''} in your cart
+        <Typography 
+          variant="h4" 
+          sx={{ 
+            fontWeight: 700, 
+            mb: 1, 
+            fontSize: { xs: '1.75rem', md: '2.125rem' } 
+          }}
+        >
+          Shopping Cart
         </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end'}}>
-              <Button variant="outlined" color="error" startIcon={<Delete />} onClick={handleClearCart} sx={{ textTransform: 'none' }}>
-                Clear Cart
-              </Button>
-            </Box>
+        <Typography variant="body1" color="text.secondary">
+          {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'} in your cart
+        </Typography>
       </Box>
-       
-    
 
       <Grid container spacing={4}>
-        <Grid size={{xs:12, md:6}} >
-          <Stack spacing={3}>
-          
+        {/* Cart Items */}
+        <Grid item xs={12} lg={8}>
+          <Stack spacing={2}>
+            {/* Clear Cart Button */}
+            {cartItems.length > 1 && (
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  size="small"
+                  startIcon={<Clear />}
+                  onClick={handleClearCart}
+                  sx={{ textTransform: 'none' }}
+                >
+                  Clear Cart
+                </Button>
+              </Box>
+            )}
+
             {cartItems.map((item, index) => (
-              <Fade in timeout={300 + index * 100} key={item._id}>
-                <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 3, transition: 'all 0.3s ease', '&:hover': { boxShadow: 3, transform: 'translateY(-2px)' } }}>
-                  <CardContent sx={{ p: 3 }}>
-                    <Grid container spacing={3} alignItems="center">
-                      <Grid size={{xs:12, md:3}} >
-                        <CardMedia component="img" image={item.images?.[0] || '/placeholder-book.jpg'} alt={item.title} sx={{ width: '100%', height: 120, objectFit: 'cover', borderRadius: 2, border: '1px solid', borderColor: 'grey.200' }} />
-                      </Grid>
-                      <Grid size={{xs:12, md:5}} >
-                        <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{item.title}</Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>by {item.author}</Typography>
-                        <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-                          <Chip label={item.condition} size="small" color="primary" variant="outlined" />
-                          <Chip label={item.category} size="small" color="secondary" variant="outlined" />
-                        </Stack>
-                        <Typography variant="body2" color="success.main" sx={{ fontWeight: 600 }}>
-                          <Verified sx={{ fontSize: 16, mr: 0.5 }} /> In Stock
+              <Fade in timeout={200 + index * 50} key={item._id}>
+                <Card 
+                  elevation={0}
+                  sx={{
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    borderRadius: 2,
+                    p: 2,
+                    opacity: removingItems.has(item._id) ? 0.5 : 1,
+                    transition: 'all 0.2s ease-in-out',
+                    '&:hover': {
+                      borderColor: 'primary.main',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                    }
+                  }}
+                >
+                  <Stack 
+                    direction={{ xs: 'column', sm: 'row' }} 
+                    spacing={2} 
+                    alignItems={{ xs: 'flex-start', sm: 'center' }}
+                  >
+                    {/* Book Image */}
+                    <CardMedia
+                      component="img"
+                      image={item.images?.[0] || '/placeholder-book.jpg'}
+                      alt={item.title}
+                      sx={{ 
+                        width: { xs: '100%', sm: 80 }, 
+                        height: { xs: 200, sm: 100 },
+                        borderRadius: 1.5,
+                        objectFit: 'cover',
+                        maxWidth: { xs: 200, sm: 80 },
+                        mx: { xs: 'auto', sm: 0 }
+                      }}
+                    />
+
+                    {/* Book Details */}
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography 
+                        variant="h6" 
+                        sx={{ 
+                          fontWeight: 600, 
+                          mb: 0.5,
+                          fontSize: { xs: '1rem', sm: '1.125rem' },
+                          lineHeight: 1.3
+                        }}
+                        noWrap
+                      >
+                        {item.title}
+                      </Typography>
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary" 
+                        sx={{ mb: 1 }}
+                      >
+                        by {item.author}
+                      </Typography>
+                      
+                      <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+                        <Chip 
+                          label={item.condition} 
+                          size="small" 
+                          variant="outlined"
+                          color="primary"
+                          sx={{ height: 24, fontSize: '0.75rem' }}
+                        />
+                        <Chip 
+                          label={item.category} 
+                          size="small" 
+                          variant="outlined"
+                          color="secondary"
+                          sx={{ height: 24, fontSize: '0.75rem' }}
+                        />
+                      </Stack>
+
+                      <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <Verified sx={{ fontSize: 16, color: 'success.main' }} />
+                        <Typography 
+                          variant="body2" 
+                          color="success.main" 
+                          fontWeight={500}
+                        >
+                          In Stock
                         </Typography>
-                      </Grid>
-                      <Grid size={{xs:12, md:4}} >
-                        <Stack spacing={2} alignItems="flex-end">
-                          <Box sx={{ textAlign: 'right' }}>
-                            <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                              ₹{(item.price)?.toLocaleString()}
-                            </Typography>
-                          </Box>
-                          <IconButton size="small" onClick={() => handleRemoveItem(item._id)} sx={{ color: 'error.main', '&:hover': { bgcolor: 'error.50' } }}>
-                            <Delete fontSize="small" />
-                          </IconButton>
-                        </Stack>
-                      </Grid>
-                    </Grid>
-                  </CardContent>
+                      </Stack>
+                    </Box>
+
+                    {/* Price and Actions */}
+                    <Stack 
+                      alignItems={{ xs: 'flex-start', sm: 'flex-end' }} 
+                      spacing={1}
+                      sx={{ minWidth: 'fit-content' }}
+                    >
+                      <Typography 
+                        variant="h6" 
+                        fontWeight={700}
+                        color="primary.main"
+                        sx={{ fontSize: { xs: '1.125rem', sm: '1.25rem' } }}
+                      >
+                        ₹{item.price.toLocaleString()}
+                      </Typography>
+                      
+                      <Tooltip title="Remove from cart">
+                        <IconButton 
+                          onClick={() => handleRemoveItem(item._id)}
+                          color="error"
+                          size="small"
+                          disabled={removingItems.has(item._id)}
+                          sx={{ 
+                            '&:hover': { 
+                              backgroundColor: 'error.main',
+                              color: 'white'
+                            }
+                          }}
+                        >
+                          <Delete fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Stack>
+                  </Stack>
                 </Card>
               </Fade>
             ))}
-            
           </Stack>
         </Grid>
-        <Grid size={{xs:12, md:6}} >
-          <Stack spacing={3} direction='row'>
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-                Order Summary
-              </Typography>
-              <Stack spacing={2}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body1">Subtotal ({cartItems.length} items)</Typography>
-                  <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                    ₹{subtotal.toLocaleString()}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+
+        {/* Order Summary */}
+        <Grid item xs={12} lg={4}>
+          <Paper 
+            elevation={0}
+            sx={{ 
+              p: 3, 
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 2,
+              position: 'sticky',
+              top: 20
+            }}
+          >
+            <Typography variant="h6" fontWeight={700} sx={{ mb: 3 }}>
+              Order Summary
+            </Typography>
+            
+            <Stack spacing={2}>
+              <Box display="flex" justifyContent="space-between">
+                <Typography variant="body1">
+                  Subtotal ({cartItems.length} {cartItems.length === 1 ? 'item' : 'items'})
+                </Typography>
+                <Typography variant="body1" fontWeight={600}>
+                  ₹{subtotal.toLocaleString()}
+                </Typography>
+              </Box>
+              
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Stack direction="row" alignItems="center" spacing={0.5}>
                   <Typography variant="body1">Shipping</Typography>
-                  <Typography variant="body1" sx={{ fontWeight: 600, color: shipping === 0 ? 'success.main' : 'text.primary' }}>
-                    {shipping === 0 ? 'FREE' : `₹${shipping}`}
-                  </Typography>
-                </Box>
-                {discount > 0 && (
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="body1" color="success.main">Discount ({discount}%)</Typography>
-                    <Typography variant="body1" sx={{ fontWeight: 600, color: 'success.main' }}>
-                      -₹{discountAmount.toFixed(2)}
-                    </Typography>
-                  </Box>
-                )}
-                <Divider />
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="h6" sx={{ fontWeight: 700 }}>Total</Typography>
-                  <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                    ₹{total.toLocaleString()}
-                  </Typography>
-                </Box>
-                   <Box>
-                  <Typography variant='body2' color='text.secondary' textAlign='center'>
-                  Add ₹{(500 - subtotal).toLocaleString()} more to get FREE shipping!
-                  </Typography>
-                </Box>
-              </Stack>
-              <Button onClick={()=>handleCheckout()} variant="contained" size="medium" fullWidth startIcon={<ShoppingCartCheckout />} sx={{ mt: 3, py: 1.5, borderRadius: 3, textTransform: 'none', fontWeight: 600, fontSize: '1rem', background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)', boxShadow: '0 3px 5px 2px rgba(33, 203, 243, .3)' }}>
+                  {shipping === 0 && (
+                    <Tooltip title="Free shipping on orders above ₹500">
+                      <InfoOutlined sx={{ fontSize: 16, color: 'text.secondary' }} />
+                    </Tooltip>
+                  )}
+                </Stack>
+                <Typography 
+                  variant="body1" 
+                  fontWeight={600}
+                  color={shipping === 0 ? 'success.main' : 'text.primary'}
+                >
+                  {shipping === 0 ? 'FREE' : `₹${shipping}`}
+                </Typography>
+              </Box>
+              
+              {subtotal < 500 && (
+                <Alert 
+                  severity="info" 
+                  sx={{ 
+                    fontSize: '0.875rem',
+                    '& .MuiAlert-icon': { fontSize: 16 }
+                  }}
+                >
+                  Add ₹{(500 - subtotal).toLocaleString()} more for FREE shipping!
+                </Alert>
+              )}
+              
+              <Divider sx={{ my: 2 }} />
+              
+              <Box display="flex" justifyContent="space-between">
+                <Typography variant="h6" fontWeight={700}>
+                  Total
+                </Typography>
+                <Typography variant="h6" fontWeight={700} color="primary.main">
+                  ₹{total.toLocaleString()}
+                </Typography>
+              </Box>
+              
+              <Button
+                fullWidth
+                variant="contained"
+                size="large"
+                startIcon={<ShoppingCartCheckout />}
+                onClick={handleCheckout}
+                sx={{ 
+                  mt: 3,
+                  py: 1.5,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: '1rem',
+                  borderRadius: 2
+                }}
+              >
                 Proceed to Checkout
               </Button>
-              <Stack direction="row" spacing={2} sx={{ mt: 3, justifyContent: 'center' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
-                  <Security sx={{ fontSize: 16, mr: 0.5 }} />
-                  <Typography variant="caption">Secure</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
-                  <LocalShipping sx={{ fontSize: 16, mr: 0.5 }} />
-                  <Typography variant="caption">Fast Delivery</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
-                  <CreditCard sx={{ fontSize: 16, mr: 0.5 }} />
-                  <Typography variant="caption">Easy Payment</Typography>
-                </Box>
-               
-              </Stack>
-            
-            </Paper>
-     
-          </Stack>
+              
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<ArrowBack />}
+                onClick={() => navigate('/books')}
+                sx={{ 
+                  textTransform: 'none',
+                  fontWeight: 500,
+                  borderRadius: 2
+                }}
+              >
+                Continue Shopping
+              </Button>
+            </Stack>
+          </Paper>
         </Grid>
       </Grid>
     </Container>

@@ -119,7 +119,7 @@ const BooksListed = () => {
         <Grid container spacing={2} pt={3} justifyContent={isMobile ? 'center' : false}>
 
           {bookData.map((book, index) => (
-            <Grid size={{ xs: 12, sm: 5, md: 2.5 }} key={index}>
+            <Grid  item xs={12} sm={4} md={3} lg={3}  key={index}>
               <IconButton
                  onClick={() => confirmDelete(book._id)}
                 sx={{
@@ -150,8 +150,8 @@ const BooksListed = () => {
 
                 <CardContent>
                   <Typography variant="h6">
-                    {book.title.length > 18
-                      ? `${book.title.slice(0, 18)}...`
+                    {book.title.length > 21
+                      ? `${book.title.slice(0, 21)}...`
                       : book.title}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
