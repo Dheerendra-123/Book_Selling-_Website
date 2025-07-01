@@ -16,9 +16,12 @@ import { CurrencyRupee } from '@mui/icons-material';
 import DiscountIcon from '@mui/icons-material/Discount';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { CircularProgress } from '@mui/material';
 
 const PreviewBook = () => {
     const theme = useTheme();
+    const [mainImageLoaded, setMainImageLoaded] = useState(false);
+
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
 
@@ -78,23 +81,23 @@ const PreviewBook = () => {
                     backgroundColor: 'lightgray',
                     width: '100%',
                     height: '20px',
-                    
+
                 }}
             />
-            <Container maxWidth={false} sx={{ maxWidth: '96%', mt:3, px: { xs: 1, sm: 2 } }}>
-                <Typography 
-                    variant={isMobile ? 'h5' : 'h4'} 
-                    color='primary' 
-                    fontWeight='600' 
-                    textAlign='center' 
+            <Container maxWidth={false} sx={{ maxWidth: '96%', mt: 3, px: { xs: 1, sm: 2 } }}>
+                <Typography
+                    variant={isMobile ? 'h5' : 'h4'}
+                    color='primary'
+                    fontWeight='600'
+                    textAlign='center'
                     gutterBottom
                     sx={{ mb: { xs: 2, md: 3 } }}
                 >
                     Book Preview
                 </Typography>
-                
-                <Stack 
-                    direction={{ xs: 'column', md: 'row' }} 
+
+                <Stack
+                    direction={{ xs: 'column', md: 'row' }}
                     spacing={{ xs: 3, md: 4 }}
                     mt={{ xs: 2, md: 4 }}
                 >
@@ -103,16 +106,33 @@ const PreviewBook = () => {
                         <Box position="relative" display="inline-block">
                             <Paper
                                 elevation={1}
-                                component='img'
-                                src={images[index]}
-                                alt='previewImg'
                                 sx={{
                                     width: { xs: '100%', sm: '500px', md: '600px' },
                                     height: { xs: '250px', sm: '350px', md: '400px' },
-                                    objectFit: 'fill'
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    backgroundColor: '#f1f1f1',
+                                    borderRadius: '8px',
                                 }}
-                            />
-
+                            >
+                                {!mainImageLoaded && <CircularProgress />}
+                                <Box
+                                    component="img"
+                                    src={images[index]}
+                                    alt="previewImg"
+                                    loading="lazy"
+                                    onLoad={() => setMainImageLoaded(true)}
+                                    style={{
+                                        display: mainImageLoaded ? 'block' : 'none',
+                                        width: '100%',
+                                        height: '100%',
+                                        objectFit: 'fill',
+                                    }}
+                                />
+                            </Paper>
                             {/* Navigation Buttons on Image */}
                             <IconButton
                                 onClick={handlePrev}
@@ -167,11 +187,11 @@ const PreviewBook = () => {
 
                         {/* Thumbnail Preview */}
                         <Box mt={2} sx={{ width: { xs: '100%', sm: '500px', md: '600px' } }}>
-                            <Stack 
-                                direction="row" 
-                                spacing={1} 
+                            <Stack
+                                direction="row"
+                                spacing={1}
                                 justifyContent="center"
-                                sx={{ 
+                                sx={{
                                     overflowX: 'auto',
                                     pb: 1,
                                     '&::-webkit-scrollbar': {
@@ -214,67 +234,67 @@ const PreviewBook = () => {
                         </Box>
                     </Stack>
 
-                    <Box 
-                        flexGrow={1} 
-                        sx={{ 
-                            maxHeight: { xs: 'none', md: '500px' }, 
+                    <Box
+                        flexGrow={1}
+                        sx={{
+                            maxHeight: { xs: 'none', md: '500px' },
                             overflow: { xs: 'visible', md: 'hidden' },
-                            border: '0.5px solid #ebeced', 
-                            p: { xs: 2, md: '10px' }, 
+                            border: '0.5px solid #ebeced',
+                            p: { xs: 2, md: '10px' },
                             borderRadius: '7px'
                         }}
                     >
-                        <Typography 
-                            variant={isMobile ? 'h5' : 'h4'} 
-                            color='primary' 
-                            gutterBottom 
+                        <Typography
+                            variant={isMobile ? 'h5' : 'h4'}
+                            color='primary'
+                            gutterBottom
                             sx={{ mb: 2 }}
                         >
                             Description
                         </Typography>
 
-                        <Typography 
-                            variant='body1' 
-                            color='text.secondary' 
-                            paragraph 
-                            sx={{ 
-                                lineHeight: 1.7, 
-                                fontSize: { xs: '14px', md: '16px' }, 
-                                mb: 2 
+                        <Typography
+                            variant='body1'
+                            color='text.secondary'
+                            paragraph
+                            sx={{
+                                lineHeight: 1.7,
+                                fontSize: { xs: '14px', md: '16px' },
+                                mb: 2
                             }}
                         >
                             {bookData.description}
                         </Typography>
 
-                        <Box 
-                            mt={3} 
-                            mb={3} 
-                            p={{ xs: 2, md: 3 }} 
-                            sx={{ 
-                                backgroundColor: '#f8f9fa', 
-                                borderRadius: '12px', 
-                                border: '1px solid #e9ecef' 
+                        <Box
+                            mt={3}
+                            mb={3}
+                            p={{ xs: 2, md: 3 }}
+                            sx={{
+                                backgroundColor: '#f8f9fa',
+                                borderRadius: '12px',
+                                border: '1px solid #e9ecef'
                             }}
                         >
                             <Grid container spacing={2}>
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <Box display="flex" alignItems="center" mb={1.5}>
-                                        <Typography 
-                                            variant="subtitle2" 
-                                            color='primary' 
-                                            sx={{ 
-                                                fontWeight: 700, 
-                                                minWidth: { xs: '70px', md: '90px' }, 
-                                                fontSize: { xs: '12px', md: '14px' } 
+                                        <Typography
+                                            variant="subtitle2"
+                                            color='primary'
+                                            sx={{
+                                                fontWeight: 700,
+                                                minWidth: { xs: '70px', md: '90px' },
+                                                fontSize: { xs: '12px', md: '14px' }
                                             }}
                                         >
                                             Title:
                                         </Typography>
-                                        <Typography 
-                                            variant="body2" 
-                                            color='text.primary' 
-                                            sx={{ 
-                                                fontSize: { xs: '12px', md: '14px' }, 
+                                        <Typography
+                                            variant="body2"
+                                            color='text.primary'
+                                            sx={{
+                                                fontSize: { xs: '12px', md: '14px' },
                                                 fontWeight: 500,
                                                 ml: 1,
                                                 wordBreak: 'break-word'
@@ -287,23 +307,23 @@ const PreviewBook = () => {
 
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <Box display="flex" alignItems="center" mb={1.5}>
-                                        <Typography 
-                                            variant="subtitle2" 
-                                            color='primary' 
-                                            sx={{ 
-                                                fontWeight: 700, 
-                                                minWidth: { xs: '70px', md: '90px' }, 
-                                                fontSize: { xs: '12px', md: '14px' } 
+                                        <Typography
+                                            variant="subtitle2"
+                                            color='primary'
+                                            sx={{
+                                                fontWeight: 700,
+                                                minWidth: { xs: '70px', md: '90px' },
+                                                fontSize: { xs: '12px', md: '14px' }
                                             }}
                                         >
                                             Author:
                                         </Typography>
-                                        <Typography 
-                                            variant="body2" 
-                                            color='text.primary' 
-                                            ml={1} 
-                                            sx={{ 
-                                                fontSize: { xs: '12px', md: '14px' }, 
+                                        <Typography
+                                            variant="body2"
+                                            color='text.primary'
+                                            ml={1}
+                                            sx={{
+                                                fontSize: { xs: '12px', md: '14px' },
                                                 fontWeight: 500,
                                                 wordBreak: 'break-word'
                                             }}
@@ -315,20 +335,20 @@ const PreviewBook = () => {
 
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <Box display="flex" alignItems="center" mb={1.5}>
-                                        <Typography 
-                                            variant="subtitle2" 
-                                            color='primary' 
-                                            sx={{ 
-                                                fontWeight: 700, 
-                                                minWidth: { xs: '70px', md: '90px' }, 
-                                                fontSize: { xs: '12px', md: '14px' } 
+                                        <Typography
+                                            variant="subtitle2"
+                                            color='primary'
+                                            sx={{
+                                                fontWeight: 700,
+                                                minWidth: { xs: '70px', md: '90px' },
+                                                fontSize: { xs: '12px', md: '14px' }
                                             }}
                                         >
                                             Price:
                                         </Typography>
                                         <CurrencyRupee style={{ fontSize: isMobile ? "16px" : "18px" }}></CurrencyRupee>
-                                        <Typography 
-                                            variant="body1" 
+                                        <Typography
+                                            variant="body1"
                                             color='success.main'
                                             sx={{ fontSize: { xs: '14px', md: '16px' } }}
                                         >
@@ -339,23 +359,23 @@ const PreviewBook = () => {
 
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <Box display="flex" alignItems="center" mb={1.5} flexWrap="wrap" gap={1}>
-                                        <Typography 
-                                            variant="subtitle2" 
-                                            color='primary' 
-                                            sx={{ 
-                                                fontWeight: 700, 
-                                                minWidth: { xs: '70px', md: '90px' }, 
-                                                fontSize: { xs: '12px', md: '14px' } 
+                                        <Typography
+                                            variant="subtitle2"
+                                            color='primary'
+                                            sx={{
+                                                fontWeight: 700,
+                                                minWidth: { xs: '70px', md: '90px' },
+                                                fontSize: { xs: '12px', md: '14px' }
                                             }}
                                         >
                                             Original:
                                         </Typography>
                                         <Box display="flex" alignItems="center" gap={1}>
                                             <CurrencyRupee style={{ fontSize: isMobile ? "16px" : "18px" }}></CurrencyRupee>
-                                            <Typography 
-                                                variant="body1" 
-                                                color='text.secondary' 
-                                                sx={{ 
+                                            <Typography
+                                                variant="body1"
+                                                color='text.secondary'
+                                                sx={{
                                                     textDecoration: 'line-through',
                                                     fontSize: { xs: '14px', md: '16px' }
                                                 }}
@@ -380,13 +400,13 @@ const PreviewBook = () => {
 
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <Box display="flex" alignItems="center" mb={1.5}>
-                                        <Typography 
-                                            variant="subtitle2" 
-                                            color='primary' 
-                                            sx={{ 
-                                                fontWeight: 700, 
-                                                minWidth: { xs: '70px', md: '90px' }, 
-                                                fontSize: { xs: '12px', md: '14px' } 
+                                        <Typography
+                                            variant="subtitle2"
+                                            color='primary'
+                                            sx={{
+                                                fontWeight: 700,
+                                                minWidth: { xs: '70px', md: '90px' },
+                                                fontSize: { xs: '12px', md: '14px' }
                                             }}
                                         >
                                             Category:
@@ -396,8 +416,8 @@ const PreviewBook = () => {
                                             size="small"
                                             variant="outlined"
                                             color="primary"
-                                            sx={{ 
-                                                height: { xs: '20px', md: '24px' }, 
+                                            sx={{
+                                                height: { xs: '20px', md: '24px' },
                                                 fontSize: { xs: '10px', md: '12px' },
                                                 ml: 1
                                             }}
@@ -407,13 +427,13 @@ const PreviewBook = () => {
 
                                 <Grid size={{ xs: 12, sm: 6 }}>
                                     <Box display="flex" alignItems="center" mb={1.5}>
-                                        <Typography 
-                                            variant="subtitle2" 
-                                            color='primary' 
-                                            sx={{ 
-                                                fontWeight: 700, 
-                                                minWidth: { xs: '70px', md: '90px' }, 
-                                                fontSize: { xs: '12px', md: '14px' } 
+                                        <Typography
+                                            variant="subtitle2"
+                                            color='primary'
+                                            sx={{
+                                                fontWeight: 700,
+                                                minWidth: { xs: '70px', md: '90px' },
+                                                fontSize: { xs: '12px', md: '14px' }
                                             }}
                                         >
                                             Condition:
@@ -423,9 +443,9 @@ const PreviewBook = () => {
                                             size='small'
                                             variant='outlined'
                                             color='success'
-                                            sx={{ 
-                                                height: { xs: '20px', md: '24px' }, 
-                                                fontSize: { xs: '10px', md: '12px' }, 
+                                            sx={{
+                                                height: { xs: '20px', md: '24px' },
+                                                fontSize: { xs: '10px', md: '12px' },
                                                 fontWeight: 600,
                                                 ml: 1
                                             }}

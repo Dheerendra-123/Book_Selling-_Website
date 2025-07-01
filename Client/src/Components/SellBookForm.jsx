@@ -113,7 +113,7 @@ const SellBookForm = () => {
   const [formData, setFormData] = useState({
     title: '',
     author: '',
-    edition: '1st',
+    edition: '',
     isbn: '',
     category: '',
     type: '',
@@ -346,7 +346,7 @@ const SellBookForm = () => {
       setFormData({
         title: '',
         author: '',
-        edition: '1st',
+        edition: '',
         isbn: '',
         category: '',
         type: '',
@@ -466,6 +466,7 @@ const SellBookForm = () => {
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 fullWidth
+                placeholder='1st'
                 label="Edition"
                 name="edition"
                 value={formData.edition}
