@@ -12,7 +12,8 @@ import {
   Tooltip,
   Container,
   Badge,
-  CircularProgress
+  CircularProgress,
+  Alert
 } from '@mui/material';
 import {
   Person,
@@ -44,6 +45,7 @@ const BookDetails = () => {
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items);
+  const wishlist = useSelector(state => state.wishlist.items); // adjust based on your slice name
 
   const handleAddToCart = async () => {
     try {
@@ -93,6 +95,14 @@ const BookDetails = () => {
 
 
   const handleAddToWishList = async () => {
+    // Check if book is already in wishlist
+    const isAlreadyInWishlist = wishlist.some(item => item._id === bookData._id);
+
+    if (isAlreadyInWishlist) {
+      handleError('This book is already in your wishlist.');
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       const res = await api.post('/api/wishlist/add', { bookId: bookData._id }, {
@@ -107,6 +117,7 @@ const BookDetails = () => {
       console.log(error);
     }
   };
+
 
 
   const getBook = async () => {
@@ -135,10 +146,10 @@ const BookDetails = () => {
     ? Math.round(((bookData.originalPrice - bookData.price) / bookData.originalPrice) * 100)
     : 0;
 
-    if (loading) {
+  if (loading) {
     return (
-      <Container maxWidth="md" sx={{height:'100vh', alignItems:'center',justifyContent:'center',display:'flex'}}>
-        <CircularProgress/>
+      <Container maxWidth="md" sx={{ height: '100vh', alignItems: 'center', justifyContent: 'center', display: 'flex' }}>
+        <CircularProgress />
       </Container>
     );
   }
@@ -254,7 +265,7 @@ const BookDetails = () => {
                       }
                     }}
                   >
-                    <Bookmark color='primary'/>
+                    <Bookmark color='primary' />
                   </IconButton>
                 </Tooltip>
 
@@ -308,7 +319,7 @@ const BookDetails = () => {
                       }
                     }}
                   >
-                    <Share color='primary'/>
+                    <Share color='primary' />
                   </IconButton>
                 </Tooltip>
               </Stack>
@@ -410,6 +421,11 @@ const BookDetails = () => {
                 >
                   Add to Cart
                 </Button>
+              )}
+              {bookData.isOrdered && (
+                <Alert severity="warning" variant="outlined" sx={{ mt: 2 }}>
+                  Someone has ordered this book
+                </Alert>
               )}
             </Stack>
 
@@ -547,7 +563,7 @@ const BookDetails = () => {
                   {bookData.contact}
                 </Typography>
               </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <WhatsApp sx={{ mr: 2, color: 'text.secondary' }} />
                 <Typography variant="body1" color="text.primary">
                   {bookData.whatsapp}

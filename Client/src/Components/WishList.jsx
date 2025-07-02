@@ -25,7 +25,7 @@ const WishList = () => {
   const dispatch = useDispatch();
   const isMobile = useMobile();
   const token = localStorage.getItem('token');
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   const getWishList = async () => {
@@ -63,7 +63,7 @@ const WishList = () => {
     }
   };
 
-  const handlego=(bookID)=>{
+  const handlego = (bookID) => {
     navigate(`/view-details/${bookID}`);
   }
 
@@ -93,10 +93,13 @@ const WishList = () => {
       ) : (
         <Grid container spacing={2} mt={5} justifyContent={isMobile ? 'center' : false}>
           {wishList.map((book, index) => (
-            <Grid item xs={12} sm={4} md={3} lg={3} key={index} sx={{cursor:'pointer',transition: 'transform 0.2s, box-shadow 0.2s','&:hover': {transform: 'scale(1.01)',boxShadow: 3,zIndex: 2}}} onClick={()=>handlego(book._id)}>
+            <Grid item xs={12} sm={4} md={3} lg={3} key={index} sx={{ cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s', '&:hover': { transform: 'scale(1.01)', boxShadow: 3, zIndex: 2 } }} onClick={() => handlego(book._id)}>
               <Box position="relative">
                 <IconButton
-                  onClick={() => handleDelete(book._id)}
+                  onClick={(e) => {
+                    e.stopPropagation(); 
+                    handleDelete(book._id);
+                  }}
                   sx={{
                     position: 'absolute',
                     top: 8,
