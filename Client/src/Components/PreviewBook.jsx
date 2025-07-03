@@ -16,11 +16,14 @@ import { CurrencyRupee } from '@mui/icons-material';
 import DiscountIcon from '@mui/icons-material/Discount';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { CircularProgress } from '@mui/material';
+import { CircularProgress, Modal, Backdrop } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
 const PreviewBook = () => {
     const theme = useTheme();
     const [mainImageLoaded, setMainImageLoaded] = useState(false);
+    const [enlargedImageLoaded, setEnlargedImageLoaded] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
@@ -29,6 +32,7 @@ const PreviewBook = () => {
 
     const [index, setIndex] = useState(0);
     const [images, setImages] = useState([]);
+    
     const handlePrev = () => {
         setIndex((prevIndex) =>
             prevIndex === 0 ? images.length - 1 : prevIndex - 1
@@ -43,6 +47,30 @@ const PreviewBook = () => {
 
     const handleThumbnailClick = (thumbIndex) => {
         setIndex(thumbIndex);
+    };
+
+    const handleImageClick = () => {
+        setIsModalOpen(true);
+        setEnlargedImageLoaded(false);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setEnlargedImageLoaded(false);
+    };
+
+    const handleModalPrev = () => {
+        setIndex((prevIndex) =>
+            prevIndex === 0 ? images.length - 1 : prevIndex - 1
+        );
+        setEnlargedImageLoaded(false);
+    };
+
+    const handleModalNext = () => {
+        setIndex((prevIndex) =>
+            prevIndex === images.length - 1 ? 0 : prevIndex + 1
+        );
+        setEnlargedImageLoaded(false);
     };
 
     const navigate = useNavigate();
@@ -67,6 +95,7 @@ const PreviewBook = () => {
     useEffect(() => {
         getBook();
     }, [])
+    
     useEffect(() => {
         console.log(bookData);
         if (Array.isArray(bookData.images)) {
@@ -81,7 +110,6 @@ const PreviewBook = () => {
                     backgroundColor: 'lightgray',
                     width: '100%',
                     height: '20px',
-
                 }}
             />
             <Container maxWidth={false} sx={{ maxWidth: '96%', mt: 3, px: { xs: 1, sm: 2 } }}>
@@ -116,7 +144,12 @@ const PreviewBook = () => {
                                     overflow: 'hidden',
                                     backgroundColor: '#f1f1f1',
                                     borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    '&:hover': {
+                                        boxShadow: 3,
+                                    }
                                 }}
+                                onClick={handleImageClick}
                             >
                                 {!mainImageLoaded && <CircularProgress />}
                                 <Box
@@ -135,7 +168,10 @@ const PreviewBook = () => {
                             </Paper>
                             {/* Navigation Buttons on Image */}
                             <IconButton
-                                onClick={handlePrev}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handlePrev();
+                                }}
                                 sx={{
                                     position: 'absolute',
                                     left: { xs: 5, md: 10 },
@@ -152,7 +188,10 @@ const PreviewBook = () => {
                             </IconButton>
 
                             <IconButton
-                                onClick={handleNext}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleNext();
+                                }}
                                 sx={{
                                     position: 'absolute',
                                     right: { xs: 5, md: 10 },
@@ -472,6 +511,144 @@ const PreviewBook = () => {
                     </Box>
                 </Stack>
             </Container>
+
+            {/* Enlarged Image Modal */}
+            <Modal
+                open={isModalOpen}
+                onClose={handleCloseModal}
+                closeAfterTransition
+                BackdropComponent={Backdrop}
+                BackdropProps={{
+                    timeout: 500,
+                    sx: { backgroundColor: 'rgba(0, 0, 0, 0.9)' }
+                }}
+            >
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: '95%', sm: '90%', md: '80%' },
+                        height: { xs: '80%', sm: '85%', md: '90%' },
+                        bgcolor: 'transparent',
+                        outline: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
+                >
+                    {/* Close Button */}
+                    <IconButton
+                        onClick={handleCloseModal}
+                        sx={{
+                            position: 'absolute',
+                            top: { xs: 10, md: 20 },
+                            right: { xs: 10, md: 20 },
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            color: 'text.primary',
+                            zIndex: 1000,
+                            '&:hover': {
+                                backgroundColor: 'rgba(255, 255, 255, 1)',
+                            }
+                        }}
+                    >
+                        <CloseIcon sx={{ fontSize: { xs: '20px', md: '24px' } }} />
+                    </IconButton>
+
+                    {/* Navigation Buttons */}
+                    <IconButton
+                        onClick={handleModalPrev}
+                        sx={{
+                            position: 'absolute',
+                            left: { xs: 10, md: 20 },
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            color: 'primary.main',
+                            zIndex: 1000,
+                            '&:hover': {
+                                backgroundColor: 'rgba(255, 255, 255, 1)',
+                            }
+                        }}
+                    >
+                        <ArrowBackIcon sx={{ fontSize: { xs: '24px', md: '30px' } }} />
+                    </IconButton>
+
+                    <IconButton
+                        onClick={handleModalNext}
+                        sx={{
+                            position: 'absolute',
+                            right: { xs: 10, md: 20 },
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            color: 'primary.main',
+                            zIndex: 1000,
+                            '&:hover': {
+                                backgroundColor: 'rgba(255, 255, 255, 1)',
+                            }
+                        }}
+                    >
+                        <ArrowForwardIcon sx={{ fontSize: { xs: '24px', md: '30px' } }} />
+                    </IconButton>
+
+                    {/* Image Container */}
+                    <Box
+                        sx={{
+                            width: '100%',
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            position: 'relative'
+                        }}
+                    >
+                        {!enlargedImageLoaded && (
+                            <CircularProgress 
+                                size={60} 
+                                sx={{ 
+                                    color: 'white',
+                                    position: 'absolute',
+                                    zIndex: 999
+                                }} 
+                            />
+                        )}
+                        <Box
+                            component="img"
+                            src={images[index]}
+                            alt="enlarged-preview"
+                            onLoad={() => setEnlargedImageLoaded(true)}
+                            sx={{
+                                display: enlargedImageLoaded ? 'block' : 'none',
+                                maxWidth: '100%',
+                                maxHeight: '100%',
+                                objectFit: 'contain',
+                                borderRadius: '8px',
+                                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)'
+                            }}
+                        />
+                    </Box>
+
+                    {/* Image Counter */}
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            bottom: { xs: 20, md: 30 },
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                            color: 'white',
+                            padding: { xs: '8px 12px', md: '10px 16px' },
+                            borderRadius: '20px',
+                            fontSize: { xs: '14px', md: '16px' },
+                            fontWeight: 500
+                        }}
+                    >
+                        {index + 1} / {images.length}
+                    </Box>
+                </Box>
+            </Modal>
         </>
     )
 }

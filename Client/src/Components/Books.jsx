@@ -134,7 +134,7 @@ const Books = () => {
 
       <Box sx={{ backgroundColor: 'lightgray', width: '100%', height: '20px' }} />
 
-      <Container maxWidth={false} sx={{ maxWidth: '96%', mb: '20px' }}>
+      <Container maxWidth={false} sx={{ maxWidth: '96%',mb:'20px'}}>
         <Box mt={2} mb={3}>
           <Stack direction="row" spacing={2} alignItems="center" justifyContent="center" mb={2}>
             <TextField
